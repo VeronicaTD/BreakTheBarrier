@@ -49,6 +49,7 @@
   #aiRecBtn.rec{background:var(--stop);border-color:var(--stop)}
   .ai-status{font-size:13px;color:var(--accent-ink);margin-top:8px;min-height:16px}
   .ai-feedback{white-space:pre-wrap;font-size:14px;line-height:1.55;color:var(--ink);margin-top:8px}
+  .exam-setup{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
   .auth-card{max-width:380px;margin:9vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 8px 30px rgba(60,30,20,.08)}
   .auth-title{font-family:"Yeseva One",Georgia,serif;font-size:28px;color:var(--accent);margin-bottom:8px}
   .auth-sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.45}
@@ -226,12 +227,18 @@
         <div class="player-box"><div id="playerWrap"><div id="player"></div></div><div class="player-ph" id="playerPh">Загрузи ссылку через «изменить ролик» ниже</div></div>
         <div class="video-hint" id="videoHint">Нажми фразу справа, потом «Прослушать» или «Повторить».</div>
         <div class="ai-pane" id="aiPane" style="display:none">
-          <div class="ai-title">🎙 Ответь и проверь у ИИ</div>
-          <div class="ai-hint">Останови видео после вопроса, нажми «Записать ответ», скажи ответ вслух, потом «Стоп» и «Проверить у ИИ».</div>
-          <div class="ai-row"><button class="btn-main" id="aiRecBtn">🎙 Записать ответ</button><button class="btn-sec" id="aiCheckBtn" style="display:none">Проверить у ИИ</button></div>
+          <div class="ai-title">🎙 Экзамен с проверкой ИИ</div>
+          <div class="ai-hint">Вставь расшифровку этого видео с таймкодами и нажми «Найти вопросы» — приложение само расставит паузы. Потом включи режим экзамена: видео остановится после каждого вопроса, ты ответишь, и ИИ разберёт ответ.</div>
+          <div class="exam-setup">
+            <textarea id="examScript" placeholder="0:05 Tell me about your hometown.&#10;0:22 What do you do in your free time?" style="width:100%;min-height:64px;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:14px"></textarea>
+            <div class="ai-row" style="margin-top:6px"><button class="btn-sec" id="findQBtn">🔎 Найти вопросы (ИИ)</button><span id="pausesInfo" style="font-size:13px;color:var(--muted)"></span></div>
+            <button class="btn-main" id="examToggle" style="display:none;width:100%;margin-top:6px">▶ Включить режим экзамена</button>
+          </div>
           <div class="ai-status" id="aiStatus"></div>
+          <div class="ai-row" style="margin-top:8px"><button class="btn-main" id="aiRecBtn">🎙 Записать ответ</button><button class="btn-sec" id="aiCheckBtn" style="display:none">Проверить у ИИ</button></div>
           <audio id="aiAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
           <div class="ai-feedback" id="aiFeedback"></div>
+          <button class="btn-main" id="aiNextBtn" style="display:none;width:100%;margin-top:10px">✓ Понятно, дальше ▶</button>
         </div>
         <button class="btn-sec" id="toTrainerBtn" style="display:none;width:100%;margin-top:10px">➕ сделать тренажёром из этого ролика</button>
         <button class="edit-toggle" id="editToggle">⚙ изменить ссылку и скрипт</button>
@@ -468,14 +475,11 @@ const SMALLTALK={
     {title:"SIELE — Oral Test, Task 4, Level B2",videoId:"thbPIBPLskE",level:"B2",desc:"Разбор задания 4 устной части SIELE на B2. Развёрнутый ответ без длинной подготовки."}
   ],
   de:[
-    {title:"Goethe-Zertifikat B1 — Modul Sprechen",videoId:"YggtVH9BoSE",level:"B1",desc:"Официальное примерное видео устной части Goethe B1. Формат: презентация, диалог, реакция на собеседника."},
-    {title:"Goethe-Zertifikat B2 — Modul Sprechen",videoId:"dZtBsH95r84",level:"B2",desc:"Пример устного экзамена Goethe B2. Тренировка монолога и обсуждения темы с партнёром."},
     {title:"Prüfungssimulation Sprechen — Goethe B2",videoId:"3s3z-yfk9fI",level:"B2",desc:"Симуляция устной части Goethe B2. Сначала отвечаешь сам, потом смотришь, как делает кандидат."},
     {title:"B2 Sprechen — Goethe & telc",videoId:"2TaaLbVHKKI",level:"B2",desc:"О формате устной части Goethe и telc B2. Не только пример, но и как строить ответ."},
     {title:"Goethe B2 Sprechen — Teil 1",videoId:"fFJ9_dCeHaI",level:"B2",desc:"Разбор первой части устного экзамена Goethe B2. Короткое выступление по теме и речевые шаблоны."},
     {title:"Goethe B2 Sprechen — Teil 2",videoId:"2K1M25igiZI",level:"B2",desc:"Вторая часть Goethe B2: обсуждение темы и реакция на собеседника. Диалог и аргументация."},
     {title:"German Speaking Test B2 — Mündliche Prüfung",videoId:"xK51mTYsYY4",level:"B2",desc:"Устный экзамен B2 с двумя кандидатами. Анализ живой речи, пауз и взаимодействия в паре."},
-    {title:"Goethe-Zertifikat C1 — Speaking Module",videoId:"HoD9dnTidxw",level:"C1",desc:"Пример устной части Goethe C1. Точность формулировок, структура и уверенная аргументация."},
     {title:"Prüfungssimulation Sprechen — Goethe C1",videoId:"p47MHUki6LQ",level:"C1",desc:"Симуляция устной части Goethe C1. Образец ответа высокого уровня для сравнения с собой."},
     {title:"Tutorial — Goethe-Zertifikat C1 Sprechen",videoId:"Ds3BdTarq_c",level:"C1",desc:"Объяснение новой устной части Goethe C1: структура, типы заданий и требования к ответу."}
   ]
@@ -777,14 +781,26 @@ function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.cl
   const mn=Math.min(...valid),mx=Math.max(...valid),rng=Math.max(15,mx-mn);const xy=[];pts.forEach((v,i)=>{if(v)xy.push({x:(i/(pts.length-1))*(w-24)+12,y:h-18-((v-mn)/rng)*(h-36),i});});
   ctx2.strokeStyle="#6e1d2a";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
 
-/* ---- Small talk: проверка ответа ИИ (Google Gemini) ---- */
+/* ---- Small talk: экзамен с проверкой ИИ (Google Gemini) ---- */
 let aiRec=null,aiChunks=[],aiBlob=null,aiBusy=false;
-function resetAI(){aiBlob=null;aiChunks=[];if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}aiRec=null;
+let examMode=false,examWaiting=false,pauseIdx=0,examTimer=null;
+const AI_MODEL="gemini-2.0-flash";
+function resetAI(){
+  aiBlob=null;aiChunks=[];if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}aiRec=null;
+  examMode=false;examWaiting=false;pauseIdx=0;clearInterval(examTimer);examTimer=null;
   const b=document.getElementById('aiRecBtn');if(b){b.textContent="🎙 Записать ответ";b.classList.remove('rec');}
   const c=document.getElementById('aiCheckBtn');if(c)c.style.display='none';
   const a=document.getElementById('aiAudio');if(a){a.style.display='none';a.removeAttribute('src');}
   const s=document.getElementById('aiStatus');if(s)s.textContent="";
-  const f=document.getElementById('aiFeedback');if(f)f.innerHTML="";}
+  const f=document.getElementById('aiFeedback');if(f)f.innerHTML="";
+  const nb=document.getElementById('aiNextBtn');if(nb)nb.style.display='none';
+  const es=document.getElementById('examScript');if(es)es.value=(curVideo&&curVideo.examScript)||"";
+  const pi=document.getElementById('pausesInfo');
+  const et=document.getElementById('examToggle');
+  const np=(curVideo&&curVideo.pauses&&curVideo.pauses.length)||0;
+  if(pi)pi.textContent=np?("пауз: "+np):"";
+  if(et){et.style.display=np?'block':'none';et.textContent="▶ Включить режим экзамена";}
+}
 function aiPickMime(){const t=['audio/ogg;codecs=opus','audio/webm;codecs=opus','audio/mp4','audio/webm'];for(const m of t){if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))return m;}return '';}
 async function aiStartRec(){
   const st=document.getElementById('aiStatus');
@@ -803,30 +819,88 @@ async function aiStartRec(){
 }
 function aiStopRec(){if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}const b=document.getElementById('aiRecBtn');b.textContent="🎙 Записать ответ";b.classList.remove('rec');}
 function aiBlobToB64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});}
-const AI_MODEL="gemini-2.0-flash";
 function aiExam(lang){return lang==='en'?"IELTS Speaking (английский)":lang==='es'?"DELE/SIELE (испанский)":"Goethe/telc (немецкий)";}
+async function geminiCall(parts){
+  const key=(APP.aikey||'').trim();if(!key)throw new Error("нет ключа");
+  const url="https://generativelanguage.googleapis.com/v1beta/models/"+AI_MODEL+":generateContent?key="+encodeURIComponent(key);
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+  const data=await r.json();
+  if(!r.ok)throw new Error((data&&data.error&&data.error.message)||("HTTP "+r.status));
+  let out="";try{out=data.candidates[0].content.parts.map(p=>p.text||'').join('');}catch(e){out="";}
+  return out;
+}
 async function aiCheck(){
   if(aiBusy)return;const st=document.getElementById('aiStatus'),fb=document.getElementById('aiFeedback');
-  const key=(APP.aikey||'').trim();
-  if(!key){st.textContent="Сначала добавь ключ ИИ: кружок профиля слева → «Ключ ИИ» → вставь и сохрани.";return;}
+  if(!(APP.aikey||'').trim()){st.textContent="Сначала добавь ключ ИИ: кружок профиля слева → «Ключ ИИ».";return;}
   if(!aiBlob){st.textContent="Сначала запиши ответ кнопкой «Записать ответ».";return;}
   aiBusy=true;st.textContent="Отправляю ответ на проверку, подожди несколько секунд…";fb.innerHTML="";
   try{
     const b64=await aiBlobToB64(aiBlob);const mime=(aiBlob.type||'audio/webm').split(';')[0];
-    const lang=APP.lang;const examName=aiExam(lang);
-    const prompt="Ты — доброжелательный экзаменатор по "+examName+". На аудио устный ответ кандидата, язык ответа: "+LANGS[lang].name+". Сделай разбор НА РУССКОМ языке, кратко и по делу, строго в таком порядке:\n1) Что услышал — короткая расшифровка ответа на языке оригинала.\n2) Примерный уровень или балл (IELTS band или CEFR A1-C2).\n3) Сильные стороны: 1-2 пункта.\n4) Ошибки и исправления: 3-5 примеров в формате «было → стало» на языке ответа.\n5) Один совет, как ответить лучше.\nБез вступления, сразу по пунктам.";
-    const url="https://generativelanguage.googleapis.com/v1beta/models/"+AI_MODEL+":generateContent?key="+encodeURIComponent(key);
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:b64}}]}]})});
-    const data=await r.json();
-    if(!r.ok){st.textContent="Ошибка ИИ: "+((data&&data.error&&data.error.message)||r.status);aiBusy=false;return;}
-    let out="";try{out=data.candidates[0].content.parts.map(p=>p.text||'').join('');}catch(e){out="";}
-    if(!out){st.textContent="ИИ не вернул разбор. Попробуй ещё раз или запиши ответ заново.";aiBusy=false;return;}
+    const lang=APP.lang;
+    const prompt="Ты — доброжелательный экзаменатор по "+aiExam(lang)+". На аудио устный ответ кандидата, язык ответа: "+LANGS[lang].name+". Сделай разбор НА РУССКОМ языке, кратко и по делу, строго в таком порядке:\n1) Что услышал — короткая расшифровка ответа на языке оригинала.\n2) Примерный уровень или балл (IELTS band или CEFR A1-C2).\n3) Сильные стороны: 1-2 пункта.\n4) Ошибки и исправления: 3-5 примеров «было → стало» на языке ответа.\n5) Один совет, как ответить лучше.\nБез вступления, сразу по пунктам.";
+    const out=await geminiCall([{text:prompt},{inline_data:{mime_type:mime,data:b64}}]);
+    if(!out){st.textContent="ИИ не вернул разбор. Попробуй ещё раз.";aiBusy=false;return;}
     st.textContent="";fb.textContent=out;
-  }catch(e){st.textContent="Не получилось связаться с ИИ. Проверь интернет и ключ.";}
+  }catch(e){st.textContent="Ошибка ИИ: "+(e.message||e);}
   aiBusy=false;
+}
+async function findQuestions(){
+  const st=document.getElementById('aiStatus');
+  const txt=document.getElementById('examScript').value.trim();
+  if(!(APP.aikey||'').trim()){st.textContent="Сначала добавь ключ ИИ в профиле (кружок слева).";return;}
+  if(!txt){st.textContent="Вставь расшифровку видео с таймкодами в поле выше.";return;}
+  st.textContent="Ищу вопросы в расшифровке…";
+  try{
+    const prompt="Вот расшифровка устного языкового экзамена с таймкодами (формат «м:сс текст»). Определи моменты, где экзаменатор задаёт вопрос кандидату. Верни ТОЛЬКО JSON-массив целых чисел — секунды от начала видео, на которых надо поставить паузу СРАЗУ ПОСЛЕ прозвучавшего вопроса, чтобы кандидат ответил сам. Только массив, без пояснений, например [15, 48, 95].\n\nРасшифровка:\n"+txt;
+    const out=await geminiCall([{text:prompt}]);
+    let arr=[];try{arr=JSON.parse(out.replace(/```json|```/g,'').trim());}catch(e){arr=[];}
+    if(!Array.isArray(arr))arr=[];
+    arr=arr.map(Number).filter(n=>!isNaN(n)&&n>=0).sort((a,b)=>a-b);
+    if(!arr.length){st.textContent="Не нашла вопросов. Проверь, что в расшифровке есть таймкоды (например 0:12).";return;}
+    curVideo.examScript=txt;curVideo.pauses=arr;persistCur();saveApp();
+    document.getElementById('pausesInfo').textContent="пауз: "+arr.length;
+    const et=document.getElementById('examToggle');et.style.display='block';et.textContent="▶ Включить режим экзамена";
+    st.textContent="Готово! Вопросов найдено: "+arr.length+". Нажми «Включить режим экзамена» и запусти видео.";
+  }catch(e){st.textContent="Ошибка ИИ: "+(e.message||e);}
+}
+function setExam(on){
+  examMode=on;examWaiting=false;
+  const et=document.getElementById('examToggle');
+  if(on){pauseIdx=0;et.textContent="⏸ Экзамен идёт — выключить";startExamMonitor();
+    if(player&&player.seekTo){try{player.seekTo(0,true);player.playVideo();}catch(e){}}
+    document.getElementById('aiStatus').textContent="Экзамен идёт. Видео остановится после первого вопроса.";
+  }else{et.textContent="▶ Включить режим экзамена";clearInterval(examTimer);examTimer=null;document.getElementById('aiNextBtn').style.display='none';}
+}
+function startExamMonitor(){
+  clearInterval(examTimer);
+  examTimer=setInterval(()=>{
+    if(!examMode||examWaiting||!player||typeof player.getCurrentTime!=='function')return;
+    const ps=curVideo&&curVideo.pauses;if(!ps||pauseIdx>=ps.length)return;
+    let ct=0;try{ct=player.getCurrentTime();}catch(e){return;}
+    if(ct>=ps[pauseIdx]-0.2){
+      try{player.pauseVideo();}catch(e){}
+      examWaiting=true;
+      document.getElementById('aiNextBtn').style.display='block';
+      document.getElementById('aiStatus').textContent="Вопрос "+(pauseIdx+1)+" из "+ps.length+". Запиши ответ, проверь у ИИ, потом жми «дальше».";
+      document.getElementById('aiPane').scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  },300);
+}
+function examNext(){
+  examWaiting=false;pauseIdx++;
+  aiBlob=null;document.getElementById('aiCheckBtn').style.display='none';
+  const a=document.getElementById('aiAudio');a.style.display='none';a.removeAttribute('src');
+  document.getElementById('aiFeedback').innerHTML="";document.getElementById('aiNextBtn').style.display='none';
+  const ps=curVideo&&curVideo.pauses;
+  if(ps&&pauseIdx>=ps.length){document.getElementById('aiStatus').textContent="Это был последний вопрос. Экзамен пройден 🎉";setExam(false);}
+  else{document.getElementById('aiStatus').textContent="Поехали дальше…";}
+  if(player&&player.playVideo){try{player.playVideo();}catch(e){}}
 }
 document.getElementById('aiRecBtn').addEventListener('click',()=>{if(aiRec&&aiRec.state==='recording')aiStopRec();else aiStartRec();});
 document.getElementById('aiCheckBtn').addEventListener('click',aiCheck);
+document.getElementById('findQBtn').addEventListener('click',findQuestions);
+document.getElementById('examToggle').addEventListener('click',()=>setExam(!examMode));
+document.getElementById('aiNextBtn').addEventListener('click',examNext);
 
 loadApp();buildLangMenu();renderHome();initAuth();
 </script>
