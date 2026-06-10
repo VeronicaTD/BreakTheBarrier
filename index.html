@@ -50,6 +50,10 @@
   .ai-status{font-size:13px;color:var(--accent-ink);margin-top:8px;min-height:16px}
   .ai-feedback{white-space:pre-wrap;font-size:14px;line-height:1.55;color:var(--ink);margin-top:8px}
   .exam-setup{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+  .exam-tip{font-size:12px;color:var(--muted);margin-bottom:5px;line-height:1.35}
+  .pause-list{margin-top:8px}
+  .pause-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border:1px solid var(--line);border-radius:7px;margin-bottom:5px;font-size:13px;background:var(--paper)}
+  .pause-x{border:none;background:none;color:var(--stop);cursor:pointer;font-size:14px}
   .auth-card{max-width:380px;margin:9vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 8px 30px rgba(60,30,20,.08)}
   .auth-title{font-family:"Yeseva One",Georgia,serif;font-size:28px;color:var(--accent);margin-bottom:8px}
   .auth-sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.45}
@@ -232,8 +236,12 @@
           <div class="ai-title">🎙 Экзамен с проверкой ИИ</div>
           <div class="ai-hint">Вставь расшифровку этого видео с таймкодами и нажми «Найти вопросы» — приложение само расставит паузы. Потом включи режим экзамена: видео остановится после каждого вопроса, ты ответишь, и ИИ разберёт ответ.</div>
           <div class="exam-setup">
-            <textarea id="examScript" placeholder="0:05 Tell me about your hometown.&#10;0:22 What do you do in your free time?" style="width:100%;min-height:64px;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:14px"></textarea>
-            <div class="ai-row" style="margin-top:6px"><button class="btn-sec" id="findQBtn">🔎 Найти вопросы (ИИ)</button><span id="pausesInfo" style="font-size:13px;color:var(--muted)"></span></div>
+            <div class="exam-tip">Способ 1 (надёжный): включи видео и на каждом вопросе нажимай «поставить паузу здесь».</div>
+            <button class="btn-sec" id="markPauseBtn" style="width:100%">✋ Поставить паузу здесь</button>
+            <div class="exam-tip" style="margin-top:10px">Способ 2: ИИ сам посмотрит видео и найдёт вопросы (в т.ч. написанные на экране). Нужен ключ и VPN.</div>
+            <button class="btn-sec" id="findQBtn" style="width:100%">🎬 Найти вопросы по видео (ИИ)</button>
+            <div id="pauseList" class="pause-list"></div>
+            <span id="pausesInfo" style="display:none"></span>
             <button class="btn-main" id="examToggle" style="display:none;width:100%;margin-top:6px">▶ Включить режим экзамена</button>
           </div>
           <div class="ai-status" id="aiStatus"></div>
@@ -802,12 +810,7 @@ function resetAI(){
   const s=document.getElementById('aiStatus');if(s)s.textContent="";
   const f=document.getElementById('aiFeedback');if(f)f.innerHTML="";
   const nb=document.getElementById('aiNextBtn');if(nb)nb.style.display='none';
-  const es=document.getElementById('examScript');if(es)es.value=(curVideo&&curVideo.examScript)||"";
-  const pi=document.getElementById('pausesInfo');
-  const et=document.getElementById('examToggle');
-  const np=(curVideo&&curVideo.pauses&&curVideo.pauses.length)||0;
-  if(pi)pi.textContent=np?("пауз: "+np):"";
-  if(et){et.style.display=np?'block':'none';et.textContent="▶ Включить режим экзамена";}
+  renderPauses();
 }
 function aiPickMime(){const t=['audio/ogg;codecs=opus','audio/webm;codecs=opus','audio/mp4','audio/webm'];for(const m of t){if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))return m;}return '';}
 async function aiStartRec(){
@@ -828,14 +831,22 @@ async function aiStartRec(){
 function aiStopRec(){if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}const b=document.getElementById('aiRecBtn');b.textContent="🎙 Записать ответ";b.classList.remove('rec');}
 function aiBlobToB64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});}
 function aiExam(lang){return lang==='en'?"IELTS Speaking (английский)":lang==='es'?"DELE/SIELE (испанский)":"Goethe/telc (немецкий)";}
+function aiSleep(ms){return new Promise(r=>setTimeout(r,ms));}
 async function geminiCall(parts){
   const key=(APP.aikey||'').trim();if(!key)throw new Error("нет ключа");
   const url="https://generativelanguage.googleapis.com/v1beta/models/"+AI_MODEL+":generateContent?key="+encodeURIComponent(key);
-  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-  const data=await r.json();
-  if(!r.ok)throw new Error((data&&data.error&&data.error.message)||("HTTP "+r.status));
-  let out="";try{out=data.candidates[0].content.parts.map(p=>p.text||'').join('');}catch(e){out="";}
-  return out;
+  let lastErr="не удалось";
+  for(let attempt=0;attempt<3;attempt++){
+    if(attempt>0){document.getElementById('aiStatus').textContent="Модель занята, пробую ещё раз…";await aiSleep(1800*attempt);}
+    let r,data;
+    try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});data=await r.json();}
+    catch(e){lastErr="нет связи";continue;}
+    if(r.ok){let out="";try{out=data.candidates[0].content.parts.map(p=>p.text||'').join('');}catch(e){out="";}return out;}
+    lastErr=(data&&data.error&&data.error.message)||("HTTP "+r.status);
+    if(r.status===503||r.status===429||/high demand|overload|unavailable|try again/i.test(lastErr))continue;
+    throw new Error(lastErr);
+  }
+  throw new Error(lastErr);
 }
 async function aiCheck(){
   if(aiBusy)return;const st=document.getElementById('aiStatus'),fb=document.getElementById('aiFeedback');
@@ -854,22 +865,39 @@ async function aiCheck(){
 }
 async function findQuestions(){
   const st=document.getElementById('aiStatus');
-  const txt=document.getElementById('examScript').value.trim();
   if(!(APP.aikey||'').trim()){st.textContent="Сначала добавь ключ ИИ в профиле (кружок слева).";return;}
-  if(!txt){st.textContent="Вставь расшифровку видео с таймкодами в поле выше.";return;}
-  st.textContent="Ищу вопросы в расшифровке…";
+  const url=(curVideo&&(curVideo.url||(curVideo.videoId?("https://youtu.be/"+curVideo.videoId):"")))||"";
+  if(!url){st.textContent="У ролика нет ссылки на видео.";return;}
+  st.textContent="ИИ смотрит видео и ищет вопросы… это может занять до минуты.";
   try{
-    const prompt="Вот расшифровка устного языкового экзамена с таймкодами (формат «м:сс текст»). Определи моменты, где экзаменатор задаёт вопрос кандидату. Верни ТОЛЬКО JSON-массив целых чисел — секунды от начала видео, на которых надо поставить паузу СРАЗУ ПОСЛЕ прозвучавшего вопроса, чтобы кандидат ответил сам. Только массив, без пояснений, например [15, 48, 95].\n\nРасшифровка:\n"+txt;
-    const out=await geminiCall([{text:prompt}]);
+    const prompt="Посмотри это видео — устный языковой экзамен. Вопросы кандидату могут звучать вслух или быть написаны текстом на экране. Найди все моменты, где кандидату задают вопрос. Верни ТОЛЬКО JSON-массив целых чисел — секунды от начала, где надо поставить паузу сразу после того, как вопрос прозвучал или появился на экране. Только массив, без пояснений, например [15, 48, 95].";
+    const out=await geminiCall([{text:prompt},{file_data:{file_uri:url}}]);
     let arr=[];try{arr=JSON.parse(out.replace(/```json|```/g,'').trim());}catch(e){arr=[];}
     if(!Array.isArray(arr))arr=[];
     arr=arr.map(Number).filter(n=>!isNaN(n)&&n>=0).sort((a,b)=>a-b);
-    if(!arr.length){st.textContent="Не нашла вопросов. Проверь, что в расшифровке есть таймкоды (например 0:12).";return;}
-    curVideo.examScript=txt;curVideo.pauses=arr;persistCur();saveApp();
-    document.getElementById('pausesInfo').textContent="пауз: "+arr.length;
-    const et=document.getElementById('examToggle');et.style.display='block';et.textContent="▶ Включить режим экзамена";
-    st.textContent="Готово! Вопросов найдено: "+arr.length+". Нажми «Включить режим экзамена» и запусти видео.";
+    if(!arr.length){st.textContent="ИИ не нашёл вопросов. Попробуй отметить паузы вручную кнопкой выше.";return;}
+    curVideo.pauses=arr;persistCur();saveApp();renderPauses();
+    st.textContent="Готово! ИИ нашёл вопросов: "+arr.length+". Проверь список, лишнее убери крестиком.";
   }catch(e){st.textContent="Ошибка ИИ: "+(e.message||e);}
+}
+function renderPauses(){
+  const pl=document.getElementById('pauseList');const et=document.getElementById('examToggle');
+  if(pl)pl.innerHTML="";
+  const ps=(curVideo&&curVideo.pauses)||[];
+  if(!ps.length){if(et){et.style.display='none';et.textContent="▶ Включить режим экзамена";}return;}
+  if(pl)ps.forEach((t,i)=>{const r=document.createElement('div');r.className="pause-row";
+    const sp=document.createElement('span');sp.textContent="пауза "+(i+1)+" — "+fmtTc(t);r.appendChild(sp);
+    const x=document.createElement('button');x.className="pause-x";x.textContent="✕";
+    x.addEventListener('click',()=>{curVideo.pauses.splice(i,1);persistCur();saveApp();renderPauses();});
+    r.appendChild(x);pl.appendChild(r);});
+  if(et){et.style.display='block';et.textContent="▶ Включить режим экзамена ("+ps.length+")";}
+}
+function markPause(){
+  const st=document.getElementById('aiStatus');
+  if(!player||typeof player.getCurrentTime!=='function'){st.textContent="Сначала запусти видео в плеере.";return;}
+  let t=0;try{t=player.getCurrentTime();}catch(e){}
+  curVideo.pauses=((curVideo&&curVideo.pauses)||[]).concat([Math.round(t)]).sort((a,b)=>a-b);
+  persistCur();saveApp();renderPauses();st.textContent="Паузу поставила на "+fmtTc(t)+".";
 }
 function setExam(on){
   examMode=on;examWaiting=false;
@@ -907,6 +935,7 @@ function examNext(){
 document.getElementById('aiRecBtn').addEventListener('click',()=>{if(aiRec&&aiRec.state==='recording')aiStopRec();else aiStartRec();});
 document.getElementById('aiCheckBtn').addEventListener('click',aiCheck);
 document.getElementById('findQBtn').addEventListener('click',findQuestions);
+document.getElementById('markPauseBtn').addEventListener('click',markPause);
 document.getElementById('examToggle').addEventListener('click',()=>setExam(!examMode));
 document.getElementById('aiNextBtn').addEventListener('click',examNext);
 
