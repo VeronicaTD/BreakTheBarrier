@@ -280,14 +280,13 @@
 
 <div class="ctrl" id="ctrl">
   <div class="ctrl-head" id="ctrlHead"></div>
-  <div class="ctrl-btns"><button class="btn-sec" id="listenBtn">🔊 Прослушать</button><button class="btn-main" id="repeatBtn">🎤 Повторить</button></div>
+  <div class="ctrl-btns"><button class="btn-sec" id="listenBtn">🔊 Прослушать</button><button class="btn-main" id="repeatBtn">🎤 Записать и оценить</button></div>
   <div class="status" id="status"></div>
   <div class="result" id="result"><div class="score" id="score"></div><div class="said" id="said"></div></div>
   <div class="tempo" id="tempo" style="display:none"></div>
   <div class="pitch-title">🎵 Мелодия твоего голоса (грубо, без сравнения с диктором)</div>
   <canvas id="pitchCanvas"></canvas>
   <div class="sh-ai" id="shAi">
-    <div class="sh-ai-row"><button class="btn-sec" id="shRecBtn">🎧 Записать и проверить (ИИ)</button><button class="btn-sec" id="shCheckBtn" style="display:none">Проверить у ИИ</button></div>
     <audio id="shAudio" controls style="display:none;width:100%;margin-top:6px"></audio>
     <div class="sh-status" id="shStatus"></div>
     <div class="ai-feedback" id="shFeedback"></div>
@@ -788,7 +787,7 @@ function startRepeat(){if(activeIndex<0)return;recognizing=true;finalText="";con
   recog.onresult=(e)=>{for(let k=e.resultIndex;k<e.results.length;k++)if(e.results[k].isFinal)finalText+=e.results[k][0].transcript+" ";};
   recog.onerror=(e)=>{if(e.error==="no-speech")document.getElementById('status').textContent="Не расслышала, ещё раз";};
   recog.onend=()=>{if(recognizing)stopRepeat();else showResult(finalText);};try{recog.start();}catch(e){}}
-function stopRepeat(){recognizing=false;const b=document.getElementById('repeatBtn');b.textContent="🎤 Повторить";b.classList.remove('recording');stopPitch();if(recog){try{recog.stop();}catch(e){}setTimeout(()=>showResult(finalText),150);}else showResult("");}
+function stopRepeat(){recognizing=false;const b=document.getElementById('repeatBtn');b.textContent="🎤 Записать и оценить";b.classList.remove('recording');stopPitch();if(recog){try{recog.stop();}catch(e){}setTimeout(()=>showResult(finalText),150);}else showResult("");}
 function showResult(said){document.getElementById('status').textContent="";if(SR){const{hit,score}=alignWords(segText(),said);const spans=[];activeLines().forEach(k=>listEl.children[k].querySelectorAll('.w').forEach(w=>spans.push(w)));spans.forEach((s,i)=>s.classList.add(hit[i]?"ok":"miss"));document.getElementById('result').classList.add('on');const v=score>=85?"Отлично! 🎯":score>=60?"Хорошо, ещё разок 👍":"Попробуй ещё раз";document.getElementById('score').textContent="Совпадение слов: "+score+"%, "+v;document.getElementById('said').innerHTML="<b>Ты сказал(а):</b> "+(said.trim()||"(тишина)");}showTempo();}
 function showTempo(){const voiced=pitchClean.filter(v=>v).length,userDur=voiced*0.05;if(userDur<0.3||lastSpeakerDur<0.3){document.getElementById('tempo').style.display="none";return;}const sp=lastSpeakerDur,ratio=userDur/sp;let v=ratio>1.25?"медленнее диктора, пободрее":ratio<0.8?"быстрее диктора, не торопись":"темп как у диктора 👍";const t=document.getElementById('tempo');t.style.display="block";t.innerHTML="🕐 <b>Темп:</b> диктор ~"+sp.toFixed(1)+"с · ты ~"+userDur.toFixed(1)+"с, "+v;}
 
@@ -796,9 +795,10 @@ let audioCtx=null,micStream=null,analyser=null,pitchTimer=null,pitchRaw=[],pitch
 const canvas=document.getElementById('pitchCanvas'),ctx2=canvas.getContext('2d');
 function clearCanvas(){const r=canvas.getBoundingClientRect();canvas.width=Math.max(300,r.width*2);canvas.height=140;ctx2.clearRect(0,0,canvas.width,canvas.height);pitchClean=[];}
 async function startPitch(){clearCanvas();pitchRaw=[];try{micStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){return;}
+  try{const _m=aiPickMime();shChunks=[];shRec=_m?new MediaRecorder(micStream,{mimeType:_m}):new MediaRecorder(micStream);shRec.ondataavailable=e=>{if(e.data&&e.data.size)shChunks.push(e.data);};shRec.onstop=()=>{shBlob=new Blob(shChunks,{type:(shRec&&shRec.mimeType)||"audio/webm"});const _a=document.getElementById("shAudio");if(_a){_a.src=URL.createObjectURL(shBlob);_a.style.display="block";}if(shAuto){shAuto=false;shCheck();}};shRec.start();}catch(e){}
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const src=audioCtx.createMediaStreamSource(micStream);analyser=audioCtx.createAnalyser();analyser.fftSize=2048;src.connect(analyser);const buf=new Float32Array(analyser.fftSize);
   pitchTimer=setInterval(()=>{analyser.getFloatTimeDomainData(buf);const f=autoCorrelate(buf,audioCtx.sampleRate);pitchRaw.push(f>0?f:null);},50);pitchSafety=setTimeout(()=>{if(recognizing)stopRepeat();},60000);}
-function stopPitch(){clearInterval(pitchTimer);pitchTimer=null;clearTimeout(pitchSafety);if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}cleanPitch();drawPitch();}
+function stopPitch(){clearInterval(pitchTimer);pitchTimer=null;clearTimeout(pitchSafety);if(shRec&&shRec.state&&shRec.state!=="inactive"){shAuto=true;try{shRec.stop();}catch(e){}}if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}cleanPitch();drawPitch();}
 function autoCorrelate(buf,sr){let size=buf.length,rms=0;for(let i=0;i<size;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/size);if(rms<0.012)return -1;let r1=0,r2=size-1,th=0.2;for(let i=0;i<size/2;i++)if(Math.abs(buf[i])<th){r1=i;break;}for(let i=1;i<size/2;i++)if(Math.abs(buf[size-i])<th){r2=size-i;break;}buf=buf.slice(r1,r2);size=buf.length;const c=new Array(size).fill(0);for(let i=0;i<size;i++)for(let j=0;j<size-i;j++)c[i]+=buf[j]*buf[j+i];let d=0;while(c[d]>c[d+1])d++;let mv=-1,mp=-1;for(let i=d;i<size;i++)if(c[i]>mv){mv=c[i];mp=i;}if(mp<=0)return -1;const f=sr/mp;return(f>70&&f<400)?f:-1;}
 function cleanPitch(){let a=pitchRaw.slice();const voiced=a.filter(v=>v);if(voiced.length){voiced.sort((x,y)=>x-y);const med=voiced[Math.floor(voiced.length/2)];a=a.map(v=>{if(!v)return null;if(v>med*1.6)return v/2;if(v<med*0.62)return v*2;return v;});}
   const sm=a.map((v,i)=>{if(!v)return null;const w=[a[i-1],a[i],a[i+1]].filter(x=>x);w.sort((x,y)=>x-y);return w[Math.floor(w.length/2)];});
@@ -950,7 +950,7 @@ document.getElementById('examToggle').addEventListener('click',()=>setExam(!exam
 document.getElementById('aiNextBtn').addEventListener('click',examNext);
 
 /* ---- Shadowing: проверка произношения/интонации/акцента у ИИ ---- */
-let shRec=null,shChunks=[],shBlob=null,shBusy=false;
+let shRec=null,shChunks=[],shBlob=null,shBusy=false,shAuto=false;
 function shResetRec(){shBlob=null;shChunks=[];if(shRec&&shRec.state&&shRec.state!=='inactive'){try{shRec.stop();}catch(e){}}shRec=null;
   const b=document.getElementById('shRecBtn');if(b){b.textContent="🎧 Записать и проверить (ИИ)";b.classList.remove('rec');}
   const c=document.getElementById('shCheckBtn');if(c)c.style.display='none';
@@ -982,8 +982,6 @@ async function shCheck(){if(shBusy)return;const st=document.getElementById('shSt
     st.textContent="";fb.textContent=out;
   }catch(e){st.textContent="Ошибка ИИ: "+(e.message||e);}
   shBusy=false;}
-document.getElementById('shRecBtn').addEventListener('click',()=>{if(shRec&&shRec.state==='recording')shStopRec();else shStartRec();});
-document.getElementById('shCheckBtn').addEventListener('click',shCheck);
 loadApp();buildLangMenu();renderHome();initAuth();
 </script>
 </body>
