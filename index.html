@@ -22,11 +22,11 @@
   .topbar .back{position:absolute;left:0;top:50%;transform:translateY(-50%)}
   .brandwrap{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.02;text-align:center;white-space:nowrap}
   .tagline{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
-  .brand{font-family:"Yeseva One",Georgia,serif;font-size:31px;color:var(--accent);letter-spacing:.01em}
+  .brand{font-family:"Yeseva One",Georgia,serif;font-size:34px;color:var(--accent);letter-spacing:.01em}
   .home-hero .h1,h2,.home-title{font-family:"Fraunces",Georgia,serif}
   .topbar .spacer{flex:1}
   .back{background:transparent;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit;font-size:14px}
-  .lang-circle{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .lang-circle{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0}
   .lang-wrap{position:relative}
   .lang-menu{position:absolute;right:0;top:48px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;display:none;box-shadow:0 8px 24px rgba(60,30,20,.12);min-width:180px}
   .lang-menu.on{display:block}
@@ -43,7 +43,7 @@
   .screen{display:none}
   .screen.on{display:block}
   .home-hero{margin:14px 0 8px}
-  .home-hero .h1{font-size:26px;font-weight:800;line-height:1.2}
+  .home-hero .h1{font-size:42px;font-weight:800;line-height:1.12}
   .home-hero .h1 .br{color:var(--accent)}
   .home-sub{color:var(--muted);margin:6px 0 22px}
   .lang-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
@@ -51,6 +51,10 @@
   .lang-card:hover{transform:translateY(-2px);border-color:var(--accent-soft)}
   .lang-card .fl{font-size:46px}
   .lang-card .nm{font-weight:700;margin-top:8px;font-size:17px}
+  .flag{object-fit:cover;border-radius:50%;display:inline-block}
+  .lang-card .fl .flag{width:76px;height:76px;box-shadow:0 3px 10px rgba(60,30,20,.15)}
+  .lang-circle .flag{width:100%;height:100%;border-radius:50%}
+  .lang-menu button .flag{width:22px;height:22px;flex:none}
   .lib-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 14px}
   .lib-head h2{font-size:21px;margin:0;flex:1}
   .tabs{display:flex;gap:8px;margin-bottom:14px}
@@ -126,8 +130,9 @@
     .video-pane{position:sticky;top:64px;width:100%;flex:none;z-index:5;background:var(--paper);padding:6px 0 8px}
     .script-pane{width:100%}
     .line{font-size:17px}
-    .brand{font-size:21px}
+    .brand{font-size:22px}
     .tagline{display:none}
+    .home-hero .h1{font-size:30px}
   }
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
@@ -216,7 +221,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const LANGS={en:{flag:"🇬🇧",name:"Английский",rec:"en-US"},es:{flag:"🇪🇸",name:"Испанский",rec:"es-ES"},de:{flag:"🇩🇪",name:"Немецкий",rec:"de-DE"}};
+const LANGS={en:{flag:"gb",name:"English",rec:"en-US"},es:{flag:"es",name:"Spanish",rec:"es-ES"},de:{flag:"de",name:"German",rec:"de-DE"}};
+function flagImg(code,w){return "<img class='flag' src='https://flagcdn.com/w"+w+"/"+code+".png' alt=''>";}
+function setLangCircle(code){document.getElementById('langCircle').innerHTML=flagImg(code,80);}
 const LEVELS=["A1","A2","B1","B2","C1","C2"];
 
 /* SHADOWING: учебные ролики по уровням (реальные, язык проверен) */
@@ -235,7 +242,47 @@ const SUGGESTED={
     {title:"How to become your own superhero",videoId:"D7hB4ZR2Tuo",level:"B2",desc:"Мотивационное выступление о внутренней силе и личной ответственности. Простая вдохновляющая идея."},
     {title:"Leben ohne Skript",videoId:"FA-qTVj3o7E",level:"B2",desc:"О жизни без готового сценария, импровизации и неожиданных поворотах. Про свободу и спонтанность."},
     {title:"Ich esse Fleisch!",videoId:"Q8U87TcxHP0",level:"B2",desc:"О еде, привычках и личном выборе. Понятная тема с поводом задуматься о своих решениях."},
-    {title:"The Path to a Fulfilling Life",videoId:"S65yOVjxZ4Q",level:"B2",desc:"О том, что делает жизнь наполненной. Про цели, смысл, личное развитие и спокойные размышления."}
+    {title:"The Path to a Fulfilling Life",videoId:"S65yOVjxZ4Q",level:"B2",desc:"О том, что делает жизнь наполненной. Про цели, смысл, личное развитие и спокойные размышления."},
+    {title:"BEGINNER German Comprehensible Input / A1 Listening Practice",videoId:"25Z9aRsbBtc",level:"A1",desc:"Простое видео для первого знакомства с немецкой речью на слух: спокойный темп, понятные фразы и базовая лексика без перегруза."},
+    {title:"Easy Beginner German — Comprehensible Input",videoId:"awscSvqsS9U",level:"A1",desc:"Для тех, кто хочет начать понимать немецкий в естественном контексте, а не только учить отдельные слова и правила."},
+    {title:"Beginner German Comprehensible Input A1 (EN+DE субтитры)",videoId:"lwc1_Dukv_o",level:"A1",desc:"Удобно для начинающих: слушаешь немецкую речь и сразу опираешься на субтитры, чтобы не терять смысл."},
+    {title:"BEGINNER German / Easy and Slow Listening Practice A1",videoId:"NQAMjRzmKFQ",level:"A1",desc:"Медленная практика аудирования для тех, кому пока сложно воспринимать немецкий в обычном темпе."},
+    {title:"Easy BEGINNER German / Hörverstehen für Anfänger A1",videoId:"Cis45Y3QZ-g",level:"A1",desc:"Короткие фразы, спокойная подача, хороший формат для самых первых тренировок слуха."},
+    {title:"Easy German for Beginners: Lesson 1 — Basics",videoId:"Wz3EaycNvh8",level:"A1",desc:"Базовый урок для старта: первые фразы, простые конструкции и понятное введение в немецкий."},
+    {title:"Learn German / My Day / Easy A1 German Story",videoId:"OrZDTPTeF7c",level:"A1",desc:"Простая история о распорядке дня, повседневных действиях и базовых глаголах, которые часто нужны в речи."},
+    {title:"Learn German: A1 Story for Beginners / She Forgot…",videoId:"NkZxTPGo_MA",level:"A1",desc:"Небольшая история для начинающих, где немецкий изучается через простой сюжет, а не сухие упражнения."},
+    {title:"Learn German: Mia und die Katze — Easy A1 Story",videoId:"EYmrSJZzupc",level:"A1",desc:"Лёгкая история с понятным бытовым сюжетом, помогает привыкнуть к немецкой речи без сложных тем."},
+    {title:"Learn German: Easy A1 Story — Mein Bruder",videoId:"6FONODQxMTk",level:"A1",desc:"Простая история о семье и повседневных ситуациях; хорошо закрепляет базовую лексику."},
+    {title:"BEGINNER German Comprehensible Input A1–A2 (DE субтитры)",videoId:"Ep3zb15gnUM",level:"A2",desc:"Переходное видео для тех, кто уже знает основы и хочет слушать больше немецкого с опорой на субтитры."},
+    {title:"A2 — Lesson 1 / Introducing yourself / sich vorstellen",videoId:"DnewKMVyflE",level:"A2",desc:"Как рассказать о себе на немецком: имя, возраст, интересы, личная информация, простая самопрезентация."},
+    {title:"EFFECTIVE A2.1 Reading + Listening Practice",videoId:"7fQj-FNWETI",level:"A2",desc:"Чтение и аудирование в одном видео: удобно видеть текст и тренировать слух одновременно."},
+    {title:"Watch this VLOG to learn German naturally (A2)",videoId:"wAaSRjLm8Xk",level:"A2",desc:"Небольшой влог на немецком для перехода от учебных фраз к более живой речи."},
+    {title:"Real-life Vlog to Learn German Naturally / A2",videoId:"xN--Wry2YZw",level:"A2",desc:"Влог из реальной жизни с понятными ситуациями и естественной речью, но без слишком сложной лексики."},
+    {title:"Learn German: A2 Story For Beginners You'll Love",videoId:"jhw2oxJ9sGs",level:"A2",desc:"Связная история для тех, кто готов понимать не отдельные фразы, а небольшой рассказ целиком."},
+    {title:"A2 German Story — Endlich Wochenende!",videoId:"i0tAWrtFeCY",level:"A2",desc:"История о выходных, отдыхе и планах; хороший вариант для тренировки бытовой лексики."},
+    {title:"Learn German / Easy A2 Story / City Adventure",videoId:"c06nG_bv7sw",level:"A2",desc:"История о городском приключении: маршрут, действия, впечатления и лексика про город."},
+    {title:"A2 Short German Story — Ein besonderer Tag",videoId:"b84zpi19TFk",level:"A2",desc:"Короткая история об особенном дне, тренирует понимание связного немецкого на слух."},
+    {title:"Learn German with stories / by listening — A2",videoId:"QMtiXBS_xlg",level:"A2",desc:"Подборка историй для аудирования: слушаешь немецкий дольше и привыкаешь к связной речи."},
+    {title:"German Listening Practice | B2 | A special travel story",videoId:"tquN_o_uTE8",level:"B2",desc:"История о путешествии: тренировка аудирования на связном рассказе, а не на отдельных фразах."},
+    {title:"German B2 Listening Practice | Goethe Zertifikat Modelltest",videoId:"3GTdT-l7EUk",level:"B2",desc:"Подготовка к аудированию формата Goethe B2: привыкаешь к экзаменационному темпу и типу заданий."},
+    {title:"Learn German B2 — 1 hour listening comprehension",videoId:"OhhVp_194zA",level:"B2",desc:"Длинная тренировка аудирования на темы общества и современной жизни. Для тех, кто хочет слушать дольше 5-10 минут подряд."},
+    {title:"Conversation in German B1-B2 with Native Speakers",videoId:"WBsOY6BDojs",level:"B2",desc:"Разговорная практика с носителями: живые фразы, естественные ответы, переход от учебного немецкого к реальной речи."},
+    {title:"German listening | B1 + B2 | Learn with a story",videoId:"JjLiTTcgXS4",level:"B2",desc:"История на тему медицины, врача и самочувствия. Расширяет бытовой словарь и понимание реальных ситуаций."},
+    {title:"German Listening Practice | B1-B2 | Learn effectively",videoId:"y8oagDQXOd8",level:"B2",desc:"Понимание немецкой речи с опорой на связный текст. Спокойная, но уже не слишком простая практика."},
+    {title:"Kontext B2 — Eine WG für alle (Kapitel 1)",videoId:"VFn4mUZnTlg",level:"B2",desc:"Документальный учебный фильм о жизни в общей квартире. Немецкий в жизненном контексте."},
+    {title:"Practice German Listening (B1-B2) | Ein Heiratsantrag",videoId:"IK72YJx7Nyg",level:"B2",desc:"История о предложении руки и сердца, где всё идёт не по плану. Лёгкий сюжет с юмором."},
+    {title:"Hören B2 | Homeoffice | Radiointerview",videoId:"bkDtLVu9G_A",level:"B2",desc:"Радиоинтервью о работе из дома. Тренирует восприятие речи в формате интервью и обсуждения актуальной темы."},
+    {title:"Goethe-Zertifikat B2 — Hören mit Lösungen",videoId:"cMmVnE4rieY",level:"B2",desc:"Экзаменационное аудирование Goethe B2 с ответами. Проверка себя в условиях, близких к реальному экзамену."},
+    {title:"Teste dein Sprachgefühl C1 | Test your German C1",videoId:"IKp7VC9tvXw",level:"C1",desc:"Проверка языкового чутья: нужно понимать не только значение слов, но и какие выражения звучат естественно по-немецки."},
+    {title:"telc German C1 Hochschule | Listening Comprehension",videoId:"94W_8Yuljt0",level:"C1",desc:"Подготовка к аудированию telc C1 Hochschule. Академическое понимание речи и экзаменационный формат."},
+    {title:"Elektrofahrzeuge | Dialog auf Deutsch C1",videoId:"e56Jv_vPaLU",level:"C1",desc:"Диалог об электромобилях и технологиях. Расширяет словарь по теме транспорта, экологии и будущего."},
+    {title:"Natural everyday dialogues | B2-C1",videoId:"wB2J69v6NUU",level:"C1",desc:"Естественные диалоги для тренировки живой речи. Для тех, кто уверенно понимает B2 и движется к C1."},
+    {title:"INFOHAZARD: When words become dangerous | German",videoId:"xe_5kQcIA9c",level:"C1",desc:"О том, как слова и информация влияют на людей. Тема абстрактная, хорошо подходит для продвинутого уровня."},
+    {title:"Pro & Contra — C1 Deutsch Discussion & Hörverstehen",videoId:"40GJoCLdgDs",level:"C1",desc:"Дискуссия формата «за и против». Учишься понимать аргументы, возражения и более сложную структуру речи."},
+    {title:"telc C1 | Prüfung Deutsch C1 | Hören 1-3 mit Lösung",videoId:"d1JssnkcrSE",level:"C1",desc:"Тренировка аудирования telc C1 с заданиями и ответами. Для подготовки к экзамену и проверки уровня понимания."},
+    {title:"Hörtraining C1-C2 | TestDaF, DSH, FSP",videoId:"OXdfgBMZAGY",level:"C1",desc:"Аудирование для продвинутой подготовки к TestDaF, DSH и другим серьёзным экзаменам. Академический немецкий."},
+    {title:"C1-C2 German Podcast | Are we reading less?",videoId:"ZcGetQ6rC38",level:"C1",desc:"Подкаст о чтении и современных привычках. Немецкий на социальные и культурные темы."},
+    {title:"Is self-optimization toxic? Pros & Cons — C1",videoId:"gi7-oYv2ISk",level:"C1",desc:"Дискуссия о саморазвитии и его минусах. Сложные современные темы и тренировка понимания аргументации."}
   ]
 };
 
@@ -281,7 +328,7 @@ function buildCloudMenu(){
   const load=document.createElement('button');load.className="btn-ghost";load.style.cssText="width:100%;margin-top:8px";load.textContent="Открыть по коду";
   load.addEventListener('click',async(e)=>{e.stopPropagation();const id=inp.value.trim();if(!id)return;load.textContent="Загружаю...";const d=await cloudLoad(id);
     if(d){APP=d;userId=id;localStorage.setItem('btb_uid',id);saveApp();cloudMenu.classList.remove('on');
-      if(APP.lang){document.getElementById('langCircle').textContent=LANGS[APP.lang].flag;renderLib();show('screenLib');}else{renderHome();show('screenHome');}}
+      if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else{renderHome();show('screenHome');}}
     else load.textContent="Не найдено. На первом устройстве открой ☁ ещё раз и убедись, что код тот же";});
   cloudMenu.appendChild(load);
   const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:12px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
@@ -302,10 +349,10 @@ document.getElementById('backBtn').addEventListener('click',()=>{if(recognizing)
 const langMenu=document.getElementById('langMenu');
 document.getElementById('langCircle').addEventListener('click',(e)=>{e.stopPropagation();langMenu.classList.toggle('on');});
 document.addEventListener('click',()=>langMenu.classList.remove('on'));
-function buildLangMenu(){langMenu.innerHTML="";Object.keys(LANGS).forEach(code=>{const b=document.createElement('button');b.innerHTML="<span style='font-size:20px'>"+LANGS[code].flag+"</span> "+LANGS[code].name;b.addEventListener('click',(e)=>{e.stopPropagation();langMenu.classList.remove('on');pickLang(code);});langMenu.appendChild(b);});}
+function buildLangMenu(){langMenu.innerHTML="";Object.keys(LANGS).forEach(code=>{const b=document.createElement('button');b.innerHTML=flagImg(LANGS[code].flag,40)+" "+LANGS[code].name;b.addEventListener('click',(e)=>{e.stopPropagation();langMenu.classList.remove('on');pickLang(code);});langMenu.appendChild(b);});}
 
-function renderHome(){const box=document.getElementById('langCards');box.innerHTML="";Object.keys(LANGS).forEach(code=>{const c=document.createElement('div');c.className="lang-card";c.innerHTML="<div class='fl'>"+LANGS[code].flag+"</div><div class='nm'>"+LANGS[code].name+"</div>";c.addEventListener('click',()=>pickLang(code));box.appendChild(c);});}
-function pickLang(code){APP.lang=code;saveApp();document.getElementById('langCircle').textContent=LANGS[code].flag;section="shadowing";libTab="levels";levelFilter="all";renderLib();show('screenLib');}
+function renderHome(){const box=document.getElementById('langCards');box.innerHTML="";Object.keys(LANGS).forEach(code=>{const c=document.createElement('div');c.className="lang-card";c.innerHTML="<div class='fl'>"+flagImg(LANGS[code].flag,160)+"</div><div class='nm'>"+LANGS[code].name+"</div>";c.addEventListener('click',()=>pickLang(code));box.appendChild(c);});}
+function pickLang(code){APP.lang=code;saveApp();setLangCircle(LANGS[code].flag);section="shadowing";libTab="levels";levelFilter="all";renderLib();show('screenLib');}
 
 /* БИБЛИОТЕКА */
 let section="shadowing",libTab="levels",favFilter=false,levelFilter="all";
@@ -485,7 +532,7 @@ function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.cl
   ctx2.strokeStyle="#6e1d2a";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
 
 loadApp();buildLangMenu();renderHome();
-if(APP.lang){document.getElementById('langCircle').textContent=LANGS[APP.lang].flag;renderLib();show('screenLib');}else show('screenHome');
+if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else show('screenHome');
 if(sb)setTimeout(cloudSave,1200);
 </script>
 </body>
