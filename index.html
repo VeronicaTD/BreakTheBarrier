@@ -54,6 +54,10 @@
   .pause-list{margin-top:8px}
   .pause-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border:1px solid var(--line);border-radius:7px;margin-bottom:5px;font-size:13px;background:var(--paper)}
   .pause-x{border:none;background:none;color:var(--stop);cursor:pointer;font-size:14px}
+  .sh-ai{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+  .sh-ai-row{display:flex;gap:8px;flex-wrap:wrap}
+  #shRecBtn.rec{background:var(--stop);border-color:var(--stop);color:#fff}
+  .sh-status{font-size:13px;color:var(--accent-ink);margin-top:6px;min-height:14px}
   .auth-card{max-width:380px;margin:9vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 8px 30px rgba(60,30,20,.08)}
   .auth-title{font-family:"Yeseva One",Georgia,serif;font-size:28px;color:var(--accent);margin-bottom:8px}
   .auth-sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.45}
@@ -282,6 +286,12 @@
   <div class="tempo" id="tempo" style="display:none"></div>
   <div class="pitch-title">🎵 Мелодия твоего голоса (грубо, без сравнения с диктором)</div>
   <canvas id="pitchCanvas"></canvas>
+  <div class="sh-ai" id="shAi">
+    <div class="sh-ai-row"><button class="btn-sec" id="shRecBtn">🎧 Записать и проверить (ИИ)</button><button class="btn-sec" id="shCheckBtn" style="display:none">Проверить у ИИ</button></div>
+    <audio id="shAudio" controls style="display:none;width:100%;margin-top:6px"></audio>
+    <div class="sh-status" id="shStatus"></div>
+    <div class="ai-feedback" id="shFeedback"></div>
+  </div>
   <button class="btn-ghost ctrl-next" id="nextBtn">следующая фраза →</button>
   <div class="srwarn" id="srWarn">На этом устройстве браузер не распознаёт речь, оценку слов не покажу. Темп и интонация работают. Лучше открыть на компьютере в Chrome.</div>
 </div>
@@ -759,7 +769,7 @@ function activeLines(){const a=[];for(let k=activeIndex;k<Math.min(activeIndex+s
 function segText(){return activeLines().map(k=>phrases()[k].text).join(' ').trim();}
 function activate(i){if(recognizing)stopRepeat();document.querySelectorAll('.line').forEach(l=>{l.classList.remove('active');l.querySelectorAll('.w').forEach(w=>w.classList.remove('ok','miss'));});
   activeIndex=i;const lines=activeLines();lines.forEach(k=>listEl.children[k].classList.add('active'));listEl.children[lines[lines.length-1]].after(ctrl);ctrl.classList.add('on');
-  document.getElementById('ctrlHead').textContent="фраза "+(i+1)+" из "+phrases().length;document.getElementById('result').classList.remove('on');document.getElementById('tempo').style.display="none";document.getElementById('status').textContent="";clearCanvas();}
+  document.getElementById('ctrlHead').textContent="фраза "+(i+1)+" из "+phrases().length;document.getElementById('result').classList.remove('on');document.getElementById('tempo').style.display="none";document.getElementById('status').textContent="";clearCanvas();if(typeof shResetRec==='function')shResetRec();}
 document.getElementById('nextBtn').addEventListener('click',()=>{const ni=activeIndex+segSize;if(ni<phrases().length){activate(ni);ctrl.scrollIntoView({behavior:'smooth',block:'center'});}});
 
 let stopTimer=null,lastSpeakerDur=0;
@@ -939,6 +949,41 @@ document.getElementById('markPauseBtn').addEventListener('click',markPause);
 document.getElementById('examToggle').addEventListener('click',()=>setExam(!examMode));
 document.getElementById('aiNextBtn').addEventListener('click',examNext);
 
+/* ---- Shadowing: проверка произношения/интонации/акцента у ИИ ---- */
+let shRec=null,shChunks=[],shBlob=null,shBusy=false;
+function shResetRec(){shBlob=null;shChunks=[];if(shRec&&shRec.state&&shRec.state!=='inactive'){try{shRec.stop();}catch(e){}}shRec=null;
+  const b=document.getElementById('shRecBtn');if(b){b.textContent="🎧 Записать и проверить (ИИ)";b.classList.remove('rec');}
+  const c=document.getElementById('shCheckBtn');if(c)c.style.display='none';
+  const a=document.getElementById('shAudio');if(a){a.style.display='none';a.removeAttribute('src');}
+  const s=document.getElementById('shStatus');if(s)s.textContent="";
+  const f=document.getElementById('shFeedback');if(f)f.innerHTML="";}
+async function shStartRec(){const st=document.getElementById('shStatus');
+  try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});shChunks=[];const mime=aiPickMime();
+    shRec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+    shRec.ondataavailable=e=>{if(e.data&&e.data.size)shChunks.push(e.data);};
+    shRec.onstop=()=>{shBlob=new Blob(shChunks,{type:(shRec&&shRec.mimeType)||'audio/webm'});stream.getTracks().forEach(t=>t.stop());
+      const a=document.getElementById('shAudio');a.src=URL.createObjectURL(shBlob);a.style.display='block';
+      document.getElementById('shCheckBtn').style.display='inline-block';document.getElementById('shStatus').textContent="Готово. Нажми «Проверить у ИИ».";};
+    shRec.start();const b=document.getElementById('shRecBtn');b.textContent="⏹ Стоп";b.classList.add('rec');
+    st.textContent="Говори фразу вслух… потом «Стоп».";
+  }catch(e){st.textContent="Нет доступа к микрофону. Разреши доступ в браузере.";}}
+function shStopRec(){if(shRec&&shRec.state&&shRec.state!=='inactive'){try{shRec.stop();}catch(e){}}const b=document.getElementById('shRecBtn');if(b){b.textContent="🎧 Записать и проверить (ИИ)";b.classList.remove('rec');}}
+async function shCheck(){if(shBusy)return;const st=document.getElementById('shStatus'),fb=document.getElementById('shFeedback');
+  if(!(APP.aikey||'').trim()){st.textContent="Сначала добавь ключ ИИ в профиле (кружок слева).";return;}
+  if(!shBlob){st.textContent="Сначала запиши фразу кнопкой «Записать и проверить».";return;}
+  const target=(typeof segText==='function'?segText():"").trim();
+  if(!target){st.textContent="Сначала выбери фразу справа.";return;}
+  shBusy=true;st.textContent="Проверяю произношение…";fb.innerHTML="";
+  try{const b64=await aiBlobToB64(shBlob);const mime=(shBlob.type||'audio/webm').split(';')[0];
+    const lang=APP.lang;
+    const prompt="Эталонная фраза на языке "+LANGS[lang].name+": «"+target+"». На аудио — попытка ученика произнести именно её. Дай разбор НА РУССКОМ, кратко и по делу, строго по пунктам:\n1) Насколько точно повторил (оценка в % и общее впечатление).\n2) Слова с ошибками произношения: список, у каждого правильная транскрипция (IPA).\n3) Интонация и ритм: что не так и как надо.\n4) Акцент: что выдаёт неносителя и как приблизить к естественному звучанию.\n5) Один короткий совет.\nБез вступления, сразу по пунктам.";
+    const out=await geminiCall([{text:prompt},{inline_data:{mime_type:mime,data:b64}}]);
+    if(!out){st.textContent="ИИ не вернул разбор. Попробуй ещё раз.";shBusy=false;return;}
+    st.textContent="";fb.textContent=out;
+  }catch(e){st.textContent="Ошибка ИИ: "+(e.message||e);}
+  shBusy=false;}
+document.getElementById('shRecBtn').addEventListener('click',()=>{if(shRec&&shRec.state==='recording')shStopRec();else shStartRec();});
+document.getElementById('shCheckBtn').addEventListener('click',shCheck);
 loadApp();buildLangMenu();renderHome();initAuth();
 </script>
 </body>
