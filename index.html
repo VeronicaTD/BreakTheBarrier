@@ -5,21 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BreakTheBarrier</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Yeseva+One&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#fffbf0; --card:#fffefb; --ink:#43232f; --muted:#9a8590;
-    --line:#efe1dc; --accent:#cf7e9b; --accent-ink:#9c4f6a; --accent-soft:#f6e3ea;
-    --sage:#9aaa6f; --ok:#7d9a52; --miss:#c2b0b8; --stop:#c85f7a; --radius:14px;
+    --paper:#fffbf0; --card:#fffdf6; --ink:#3a2026; --muted:#9b8579;
+    --line:#ece0d4; --accent:#6e1d2a; --accent-ink:#54141f; --accent-soft:#f0dcdd;
+    --ok:#6e1d2a; --miss:#c0b3a4; --stop:#9a2f3a; --radius:14px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
-  body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(55% 45% at 10% 6%, rgba(207,126,155,.20), transparent 62%),radial-gradient(55% 50% at 94% 98%, rgba(154,170,111,.18), transparent 62%)}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(55% 45% at 10% 6%, rgba(110,29,42,.10), transparent 62%),radial-gradient(55% 50% at 92% 98%, rgba(110,29,42,.06), transparent 62%)}
   body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;background-image:radial-gradient(rgba(67,35,47,.05) 0.5px,transparent 0.7px);background-size:3px 3px}
   .wrap{max-width:1080px;margin:0 auto;padding:0 16px 50px}
-  .topbar{display:flex;align-items:center;gap:12px;padding:16px 0;position:sticky;top:0;background:var(--paper);z-index:20}
-  .brand{cursor:pointer;font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;color:var(--accent);letter-spacing:.01em}
+  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:18px 0 14px;position:sticky;top:0;background:var(--paper);z-index:20;min-height:60px;border-bottom:1px solid var(--line)}
+  .topbar .back{position:absolute;left:0;top:50%;transform:translateY(-50%)}
+  .brandwrap{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.02;text-align:center;white-space:nowrap}
+  .tagline{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .brand{font-family:"Yeseva One",Georgia,serif;font-size:31px;color:var(--accent);letter-spacing:.01em}
   .home-hero .h1,h2,.home-title{font-family:"Fraunces",Georgia,serif}
   .topbar .spacer{flex:1}
   .back{background:transparent;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit;font-size:14px}
@@ -123,6 +126,8 @@
     .video-pane{position:sticky;top:64px;width:100%;flex:none;z-index:5;background:var(--paper);padding:6px 0 8px}
     .script-pane{width:100%}
     .line{font-size:17px}
+    .brand{font-size:21px}
+    .tagline{display:none}
   }
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
@@ -130,8 +135,8 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <button class="back" id="backBtn" style="display:none">← к роликам</button>
-    <span class="brand" id="homeLogo">BreakTheBarrier</span>
+    <button class="back" id="backBtn" title="назад" style="display:none">←</button>
+    <div class="brandwrap" id="homeLogo"><span class="brand">✦ BreakTheBarrier</span><span class="tagline">ломаем языковой барьер</span></div>
     <span class="spacer"></span>
     <div class="lang-wrap"><button class="lang-circle" id="cloudCircle" style="display:none">☁</button><div class="lang-menu" id="cloudMenu" style="min-width:250px;padding:14px"></div></div>
     <div class="lang-wrap"><button class="lang-circle" id="langCircle" style="display:none">🌐</button><div class="lang-menu" id="langMenu"></div></div>
@@ -475,9 +480,9 @@ function autoCorrelate(buf,sr){let size=buf.length,rms=0;for(let i=0;i<size;i++)
 function cleanPitch(){let a=pitchRaw.slice();const voiced=a.filter(v=>v);if(voiced.length){voiced.sort((x,y)=>x-y);const med=voiced[Math.floor(voiced.length/2)];a=a.map(v=>{if(!v)return null;if(v>med*1.6)return v/2;if(v<med*0.62)return v*2;return v;});}
   const sm=a.map((v,i)=>{if(!v)return null;const w=[a[i-1],a[i],a[i+1]].filter(x=>x);w.sort((x,y)=>x-y);return w[Math.floor(w.length/2)];});
   for(let i=0;i<sm.length;i++){if(sm[i]==null){let j=i;while(j<sm.length&&sm[j]==null)j++;const before=sm[i-1],after=sm[j];if(before!=null&&after!=null&&(j-i)<=5){for(let k=i;k<j;k++)sm[k]=before+(after-before)*((k-i+1)/(j-i+1));}i=j-1;}}pitchClean=sm;}
-function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.clearRect(0,0,w,h);const valid=pts.filter(v=>v);if(valid.length<3){ctx2.fillStyle="#c2b0b8";ctx2.font="20px -apple-system,sans-serif";ctx2.fillText("нет звука, скажи громче",20,h/2);return;}
+function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.clearRect(0,0,w,h);const valid=pts.filter(v=>v);if(valid.length<3){ctx2.fillStyle="#c0b3a4";ctx2.font="20px -apple-system,sans-serif";ctx2.fillText("нет звука, скажи громче",20,h/2);return;}
   const mn=Math.min(...valid),mx=Math.max(...valid),rng=Math.max(15,mx-mn);const xy=[];pts.forEach((v,i)=>{if(v)xy.push({x:(i/(pts.length-1))*(w-24)+12,y:h-18-((v-mn)/rng)*(h-36),i});});
-  ctx2.strokeStyle="#cf7e9b";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
+  ctx2.strokeStyle="#6e1d2a";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
 
 loadApp();buildLangMenu();renderHome();
 if(APP.lang){document.getElementById('langCircle').textContent=LANGS[APP.lang].flag;renderLib();show('screenLib');}else show('screenHome');
