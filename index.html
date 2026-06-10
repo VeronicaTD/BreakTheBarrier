@@ -18,9 +18,10 @@
   body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(55% 45% at 10% 6%, rgba(110,29,42,.10), transparent 62%),radial-gradient(55% 50% at 92% 98%, rgba(110,29,42,.06), transparent 62%)}
   body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;background-image:radial-gradient(rgba(67,35,47,.05) 0.5px,transparent 0.7px);background-size:3px 3px}
   .wrap{max-width:1080px;margin:0 auto;padding:0 16px 50px}
-  .topbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:18px 0 14px;position:sticky;top:0;background:var(--paper);z-index:20;min-height:60px;border-bottom:1px solid var(--line)}
-  .topbar .back{position:absolute;left:0;top:50%;transform:translateY(-50%)}
-  .brandwrap{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.02;text-align:center;white-space:nowrap}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 0 14px;position:sticky;top:0;background:var(--paper);z-index:20;min-height:60px;border-bottom:1px solid var(--line)}
+  .bar-side{display:flex;align-items:center;gap:8px;z-index:2}
+  #cloudMenu{left:0;right:auto}
+  .brandwrap{position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;line-height:1.02;text-align:center;white-space:nowrap;z-index:1;pointer-events:auto}
   .tagline{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px}
   .brand{font-family:"Yeseva One",Georgia,serif;font-size:34px;color:var(--accent);letter-spacing:.01em}
   .home-hero .h1,h2,.home-title{font-family:"Fraunces",Georgia,serif}
@@ -41,6 +42,13 @@
   textarea{min-height:120px;resize:vertical;font-size:14px;line-height:1.45}
   input:focus,button:focus-visible,textarea:focus,select:focus{outline:3px solid var(--accent-soft);outline-offset:1px;border-color:var(--accent)}
   .screen{display:none}
+  .ai-pane{margin-top:12px;background:var(--accent-soft);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .ai-title{font-weight:800;color:var(--accent);margin-bottom:4px}
+  .ai-hint{font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.4}
+  .ai-row{display:flex;gap:8px;flex-wrap:wrap}
+  #aiRecBtn.rec{background:var(--stop);border-color:var(--stop)}
+  .ai-status{font-size:13px;color:var(--accent-ink);margin-top:8px;min-height:16px}
+  .ai-feedback{white-space:pre-wrap;font-size:14px;line-height:1.55;color:var(--ink);margin-top:8px}
   .auth-card{max-width:380px;margin:9vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 8px 30px rgba(60,30,20,.08)}
   .auth-title{font-family:"Yeseva One",Georgia,serif;font-size:28px;color:var(--accent);margin-bottom:8px}
   .auth-sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.45}
@@ -61,7 +69,7 @@
   .lang-circle .flag{width:100%;height:100%;border-radius:50%}
   .lang-menu button .flag{width:22px;height:22px;flex:none}
   .lib-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 14px}
-  .lib-head h2{font-size:21px;margin:0;flex:1}
+  .lib-head h2{font-size:27px;margin:0;flex:1}
   .tabs{display:flex;gap:8px;margin-bottom:14px}
   .tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
   .tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -116,6 +124,13 @@
   select{padding:6px 8px;font-size:14px}
   .script-empty{font-size:14px;color:var(--muted);padding:20px 6px}
   .line{padding:9px 12px;border-radius:9px;font-size:16px;line-height:1.5;cursor:pointer;border:1px solid transparent;transition:background .12s}
+  .line-edit{margin-bottom:10px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--card)}
+  .ph-text{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:15px;line-height:1.45;resize:vertical;color:var(--ink);background:#fff;box-sizing:border-box}
+  .ph-tools{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+  .ph-tc{width:64px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;font-size:13px;text-align:center}
+  .ph-btn{padding:5px 10px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);font-size:13px;cursor:pointer}
+  .ph-btn.del{color:var(--stop);border-color:var(--stop)}
+  .ph-btn.add{display:block;width:100%;margin-top:4px;color:var(--accent);border-color:var(--accent)}
   .line:hover{background:#fff}
   .line.active{background:#fff;border-color:var(--accent-soft)}
   .line .w.ok{color:var(--ok);font-weight:700}
@@ -143,7 +158,7 @@
     .video-pane{position:sticky;top:64px;width:100%;flex:none;z-index:5;background:var(--paper);padding:6px 0 8px}
     .script-pane{width:100%}
     .line{font-size:17px}
-    .brand{font-size:22px}
+    .brand{font-size:20px}
     .tagline{display:none}
     .home-hero .h1{font-size:30px}
   }
@@ -153,11 +168,14 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <button class="back" id="backBtn" title="назад" style="display:none">←</button>
+    <div class="bar-side bar-left">
+      <button class="back" id="backBtn" title="назад" style="display:none">←</button>
+      <div class="lang-wrap"><button class="lang-circle" id="cloudCircle" style="display:none">☁</button><div class="lang-menu" id="cloudMenu" style="min-width:250px;padding:14px"></div></div>
+    </div>
     <div class="brandwrap" id="homeLogo"><span class="brand">✦ BreakTheBarrier</span><span class="tagline">ломаем языковой барьер</span></div>
-    <span class="spacer"></span>
-    <div class="lang-wrap"><button class="lang-circle" id="cloudCircle" style="display:none">☁</button><div class="lang-menu" id="cloudMenu" style="min-width:250px;padding:14px"></div></div>
-    <div class="lang-wrap"><button class="lang-circle" id="langCircle" style="display:none">🌐</button><div class="lang-menu" id="langMenu"></div></div>
+    <div class="bar-side bar-right">
+      <div class="lang-wrap"><button class="lang-circle" id="langCircle" style="display:none">🌐</button><div class="lang-menu" id="langMenu"></div></div>
+    </div>
   </div>
 
   <div class="screen" id="screenAuth">
@@ -183,8 +201,6 @@
   <div class="screen" id="screenLib">
     <div class="lib-head">
       <h2 id="libTitle"></h2>
-      <button class="btn-ghost" id="favBtn">☆ избранное</button>
-      <button class="btn-main" id="addBtn">➕ ролик</button>
     </div>
     <div class="tabs" id="sectionTabs"></div>
     <div class="subtabs" id="subtabs"></div>
@@ -209,6 +225,14 @@
       <div class="video-pane">
         <div class="player-box"><div id="playerWrap"><div id="player"></div></div><div class="player-ph" id="playerPh">Загрузи ссылку через «изменить ролик» ниже</div></div>
         <div class="video-hint" id="videoHint">Нажми фразу справа, потом «Прослушать» или «Повторить».</div>
+        <div class="ai-pane" id="aiPane" style="display:none">
+          <div class="ai-title">🎙 Ответь и проверь у ИИ</div>
+          <div class="ai-hint">Останови видео после вопроса, нажми «Записать ответ», скажи ответ вслух, потом «Стоп» и «Проверить у ИИ».</div>
+          <div class="ai-row"><button class="btn-main" id="aiRecBtn">🎙 Записать ответ</button><button class="btn-sec" id="aiCheckBtn" style="display:none">Проверить у ИИ</button></div>
+          <div class="ai-status" id="aiStatus"></div>
+          <audio id="aiAudio" controls style="display:none;width:100%;margin-top:8px"></audio>
+          <div class="ai-feedback" id="aiFeedback"></div>
+        </div>
         <button class="btn-sec" id="toTrainerBtn" style="display:none;width:100%;margin-top:10px">➕ сделать тренажёром из этого ролика</button>
         <button class="edit-toggle" id="editToggle">⚙ изменить ссылку и скрипт</button>
         <div class="edit-box" id="editBox">
@@ -225,6 +249,7 @@
       <div class="script-pane">
         <div class="script-bar"><span class="count" id="count"></span>
           <label>за раз:<select id="segSel"><option value="1">1 фраза</option><option value="2">2 фразы</option><option value="3">3 фразы</option><option value="4">4 фразы</option></select></label>
+          <button class="btn-ghost" id="editScriptBtn" style="padding:5px 10px;font-size:13px;display:none">✏ редактировать</button>
         </div>
         <div id="scriptList"></div>
       </div>
@@ -417,7 +442,44 @@ const SUGGESTED={
 const MEDIA={en:[],es:[],de:[]};
 
 /* SMALL TALK: международные экзамены (реальные образцы устной части) */
-const SMALLTALK={en:[],es:[],de:[]};
+const SMALLTALK={
+  en:[
+    {title:"IELTS Speaking — Band 6 (with feedback)",videoId:"aI0JX2qc870",level:"Band 6",desc:"Полная симуляция IELTS Speaking с кандидатом Band 6 и обратной связью. Ответь сам, потом сравни с кандидатом и замечаниями эксперта."},
+    {title:"IELTS Speaking — Band 6.5 (with feedback)",videoId:"OicvdCp5wrM",level:"Band 6.5",desc:"Пример ответа на Band 6.5. Видно разницу между «говорю понятно» и «говорю уже ближе к уверенной экзаменационной речи»."},
+    {title:"IELTS Speaking — Band 7 (with feedback)",videoId:"xnaOzlC2RXg",level:"Band 7",desc:"Mock test с кандидатом Band 7. Образец уверенной речи: ответы развёрнутые, но понятные для анализа."},
+    {title:"IELTS Speaking — Band 7 (2025)",videoId:"x8xB5_-yl90",level:"Band 7",desc:"Современный пример Band 7 с подробной обратной связью. Тренировка структуры ответа и умения развивать мысль."},
+    {title:"Full IELTS Speaking Test — Band 7",videoId:"1rQsCMGDmpA",level:"Band 7",desc:"Полный устный тест на Band 7. Формат «пауза после вопроса, мой ответ, ответ кандидата»."},
+    {title:"IELTS Speaking sample — Part 3, Hendrik (Band 7)",videoId:"HvdcDzG56ik",level:"Part 3",desc:"Официальный sample IELTS Part 3. Тренировка более сложной части, где нужно рассуждать, а не просто рассказывать о себе."},
+    {title:"IELTS Speaking sample — Part 3, Alexandra (Band 7)",videoId:"TQ9Hjmce3EI",level:"Part 3",desc:"Ответ кандидата Band 7 в третьей части. Работа с аргументацией и более взрослыми темами."},
+    {title:"IELTS Speaking — Band 9 (with feedback)",videoId:"tKFFrCNsioQ",level:"Band 9",desc:"Пример сильного ответа Band 9 с обратной связью. Образец естественной, гибкой и уверенной речи."},
+    {title:"IELTS Speaking — Band 9 (2025)",videoId:"RBwx5atq-PY",level:"Band 9",desc:"Современная симуляция Band 9. Видно, как выглядит почти идеальный ответ."},
+    {title:"Shadow This — Band 9 IELTS Speaking",videoId:"gdzrv2N40II",level:"Band 9",desc:"Для тренировки по методу shadowing: слушаешь Band 9 ответ и повторяешь за кандидатом, улучшая темп, интонацию и связность."}
+  ],
+  es:[
+    {title:"DELE B2 — Oral expression and interaction",videoId:"YYm46-Y2w5Y",level:"B2",desc:"Пример устной части DELE B2. Монолог и взаимодействие с экзаменатором в формате экзамена."},
+    {title:"DELE B2 — Examen Oral (подборка)",playlistId:"PLP3Og1XwqeEvtdyb5uF-ih69q9srZM4A5",level:"B2",desc:"Плейлист по устной части DELE B2: темы, фразы, стратегии и примеры ответов."},
+    {title:"How to pass DELE B2 Oral with ease",videoId:"49BW57DjOH0",level:"B2",desc:"Как готовиться к устной части DELE B2: структура ответа, тайминг и полезные фразы."},
+    {title:"50 Questions to Practice Speaking — DELE B1-B2",videoId:"ZBkevSGGhHE",level:"B1-B2",desc:"Подборка вопросов для устной практики. Слушаешь вопрос, отвечаешь сам, потом сравниваешь с моделью."},
+    {title:"DELE C1-C2 — 50 Questions to Practice",videoId:"RN5l_yP51uM",level:"C1-C2",desc:"Продвинутые вопросы для устной части. Тренировка аргументации и сложных тем."},
+    {title:"Examen DELE C1 — Johannes",videoId:"s1zgxd-4KsE",level:"C1",desc:"Пример устного экзамена DELE C1. Структура ответа, реакция на вопросы, сложная лексика."},
+    {title:"Advanced Expressions — Oral Task DELE C1",videoId:"VWXEJvXc0MA",level:"C1",desc:"Подготовка к продвинутой устной части DELE C1: переговоры, дискуссия, аргументы и контраргументы."},
+    {title:"SIELE — Spoken Expression and Interaction",videoId:"syLh_AESjEc",level:"SIELE",desc:"О части SIELE про устную речь и взаимодействие. Для цифрового международного экзамена по испанскому."},
+    {title:"SIELE — Oral Test, Task 3, Level B1",videoId:"OopxDyFvJGc",level:"B1",desc:"Пример задания устной части SIELE на B1. Ответ по конкретной ситуации."},
+    {title:"SIELE — Oral Test, Task 4, Level B2",videoId:"thbPIBPLskE",level:"B2",desc:"Разбор задания 4 устной части SIELE на B2. Развёрнутый ответ без длинной подготовки."}
+  ],
+  de:[
+    {title:"Goethe-Zertifikat B1 — Modul Sprechen",videoId:"YggtVH9BoSE",level:"B1",desc:"Официальное примерное видео устной части Goethe B1. Формат: презентация, диалог, реакция на собеседника."},
+    {title:"Goethe-Zertifikat B2 — Modul Sprechen",videoId:"dZtBsH95r84",level:"B2",desc:"Пример устного экзамена Goethe B2. Тренировка монолога и обсуждения темы с партнёром."},
+    {title:"Prüfungssimulation Sprechen — Goethe B2",videoId:"3s3z-yfk9fI",level:"B2",desc:"Симуляция устной части Goethe B2. Сначала отвечаешь сам, потом смотришь, как делает кандидат."},
+    {title:"B2 Sprechen — Goethe & telc",videoId:"2TaaLbVHKKI",level:"B2",desc:"О формате устной части Goethe и telc B2. Не только пример, но и как строить ответ."},
+    {title:"Goethe B2 Sprechen — Teil 1",videoId:"fFJ9_dCeHaI",level:"B2",desc:"Разбор первой части устного экзамена Goethe B2. Короткое выступление по теме и речевые шаблоны."},
+    {title:"Goethe B2 Sprechen — Teil 2",videoId:"2K1M25igiZI",level:"B2",desc:"Вторая часть Goethe B2: обсуждение темы и реакция на собеседника. Диалог и аргументация."},
+    {title:"German Speaking Test B2 — Mündliche Prüfung",videoId:"xK51mTYsYY4",level:"B2",desc:"Устный экзамен B2 с двумя кандидатами. Анализ живой речи, пауз и взаимодействия в паре."},
+    {title:"Goethe-Zertifikat C1 — Speaking Module",videoId:"HoD9dnTidxw",level:"C1",desc:"Пример устной части Goethe C1. Точность формулировок, структура и уверенная аргументация."},
+    {title:"Prüfungssimulation Sprechen — Goethe C1",videoId:"p47MHUki6LQ",level:"C1",desc:"Симуляция устной части Goethe C1. Образец ответа высокого уровня для сравнения с собой."},
+    {title:"Tutorial — Goethe-Zertifikat C1 Sprechen",videoId:"Ds3BdTarq_c",level:"C1",desc:"Объяснение новой устной части Goethe C1: структура, типы заданий и требования к ответу."}
+  ]
+};
 
 let APP={lang:null,data:{en:{videos:[]},es:{videos:[]},de:{videos:[]}}};
 let curVideo=null;
@@ -449,7 +511,14 @@ function buildProfileMenu(){
   const em=document.createElement('div');em.style.cssText="font-weight:700;word-break:break-all;font-size:14px;margin-bottom:12px";em.textContent=userEmail||"локальный режим";cloudMenu.appendChild(em);
   const out=document.createElement('button');out.className="btn-sec";out.style.width="100%";out.textContent="Выйти";
   out.addEventListener('click',(e)=>{e.stopPropagation();doSignOut();});cloudMenu.appendChild(out);
-  const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:10px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
+  const fav=document.createElement('button');fav.className="btn-ghost";fav.style.cssText="width:100%;margin-top:10px";fav.textContent=favFilter?"Показать все ролики":"★ Только избранное";
+  fav.addEventListener('click',(e)=>{e.stopPropagation();favFilter=!favFilter;cloudMenu.classList.remove('on');if(APP.lang)renderLib();});
+  cloudMenu.appendChild(fav);
+  const kl=document.createElement('div');kl.style.cssText="font-size:12px;color:var(--muted);margin:14px 0 4px;line-height:1.35";kl.textContent="Ключ ИИ (Google Gemini) — для проверки ответов в Small talk";cloudMenu.appendChild(kl);
+  const ki=document.createElement('input');ki.type="text";ki.placeholder="вставь ключ сюда";ki.value=APP.aikey||"";ki.style.cssText="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-bottom:6px";ki.addEventListener('click',e=>e.stopPropagation());cloudMenu.appendChild(ki);
+  const ks=document.createElement('button');ks.className="btn-sec";ks.style.width="100%";ks.textContent="Сохранить ключ";
+  ks.addEventListener('click',(e)=>{e.stopPropagation();APP.aikey=ki.value.trim();saveApp();ks.textContent="Ключ сохранён ✓";setTimeout(()=>{ks.textContent="Сохранить ключ";},1500);});cloudMenu.appendChild(ks);
+  const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:14px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
   clr.addEventListener('click',(e)=>{e.stopPropagation();if(confirm("Удалить все ролики, которые ты добавляла или открывала? Встроенные рекомендации останутся.")){APP.data={en:{videos:[]},es:{videos:[]},de:{videos:[]}};saveApp();cloudMenu.classList.remove('on');renderLib();}});
   cloudMenu.appendChild(clr);
 }
@@ -494,8 +563,7 @@ function pickLang(code){APP.lang=code;saveApp();setLangCircle(LANGS[code].flag);
 
 /* БИБЛИОТЕКА */
 let section="shadowing",libTab="levels",favFilter=false,levelFilter="all";
-document.getElementById('favBtn').addEventListener('click',()=>{favFilter=!favFilter;document.getElementById('favBtn').textContent=favFilter?"★ избранное":"☆ избранное";renderLib();});
-document.getElementById('addBtn').addEventListener('click',()=>{document.getElementById('addTitle').value="";document.getElementById('addUrl').value="";document.getElementById('addScript').value="";document.getElementById('addLevel').value="B1";show('screenAdd');});
+function openAddScreen(){document.getElementById('addTitle').value="";document.getElementById('addUrl').value="";document.getElementById('addScript').value="";document.getElementById('addLevel').value="B1";show('screenAdd');}
 
 function renderSectionTabs(){const t=document.getElementById('sectionTabs');t.innerHTML="";
   [["shadowing","Shadowing"],["smalltalk","Small talk"]].forEach(([id,name])=>{const b=document.createElement('button');b.className="tab"+(section===id?" on":"");b.textContent=name;b.addEventListener('click',()=>{section=id;levelFilter="all";renderLib();});t.appendChild(b);});}
@@ -544,25 +612,35 @@ function renderLeveled(body,items){
   const order=LEVELS.concat(["Без уровня"]);const groups={};items.forEach(it=>{const lv=it.level||"Без уровня";(groups[lv]=groups[lv]||[]).push(it);});
   const isAll=(levelFilter==="all");order.forEach(lv=>{if(!groups[lv])return;const g=document.createElement('div');g.className="lvl-group";const h=document.createElement('div');h.className="lvl-name";h.textContent=lv;g.appendChild(h);const grid=document.createElement('div');grid.className="vid-grid"+(isAll?" row":"");groups[lv].forEach(it=>grid.appendChild(makeCard(it)));g.appendChild(isAll?wrapCarousel(grid):grid);body.appendChild(g);});
 }
-function renderMedia(body){const list=MEDIA[APP.lang]||[];if(!list.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Медиатека пуста. Добавь свои ролики кнопкой «➕ ролик».";body.appendChild(e);return;}const grid=document.createElement('div');grid.className="vid-grid";list.forEach(it=>grid.appendChild(makeMediaCard(it)));body.appendChild(grid);}
+function renderMedia(body){
+  const lang=APP.lang;
+  const add=document.createElement('button');add.className="btn-main";add.style.cssText="margin-bottom:16px";add.textContent="+ добавить свой ролик";
+  add.addEventListener('click',openAddScreen);body.appendChild(add);
+  let mine=APP.data[lang].videos.map(v=>Object.assign({kind:'mine'},v));
+  if(favFilter)mine=mine.filter(v=>v.fav);
+  const baked=MEDIA[lang]||[];
+  if(!mine.length&&!baked.length){const e=document.createElement('div');e.className="lib-empty";e.textContent=favFilter?"Среди твоих роликов нет избранных.":"Здесь будут твои ролики. Нажми «+ добавить свой ролик» и вставь ссылку с YouTube.";body.appendChild(e);return;}
+  const grid=document.createElement('div');grid.className="vid-grid";
+  mine.forEach(it=>grid.appendChild(makeCard(it)));
+  baked.forEach(it=>grid.appendChild(makeMediaCard(it)));
+  body.appendChild(grid);
+}
+function renderFlat(body,items){
+  if(!items.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Здесь пока пусто.";body.appendChild(e);return;}
+  const grid=document.createElement('div');grid.className="vid-grid";
+  items.forEach(it=>grid.appendChild(makeCard(it)));
+  body.appendChild(grid);
+}
 function renderLib(){
   const lang=APP.lang;
   document.getElementById('libTitle').textContent=LANGS[lang].name;
   renderSectionTabs();renderSubtabs();
   const chipsEl=document.getElementById('chips'),body=document.getElementById('libBody');body.innerHTML="";
-  const inShadowLevels=section==="shadowing"&&libTab==="levels";
-  document.getElementById('favBtn').style.display=inShadowLevels?'inline-block':'none';
-  document.getElementById('addBtn').style.display=section==="shadowing"?'inline-block':'none';
   if(section==="shadowing"&&libTab==="media"){chipsEl.style.display='none';renderMedia(body);return;}
+  if(section==="smalltalk"){chipsEl.style.display='none';const items=(SMALLTALK[lang]||[]).map(s=>Object.assign({kind:'suggested',note:'экзамен'},s));renderFlat(body,items);return;}
   chipsEl.style.display='flex';renderChips();
-  if(section==="smalltalk"){
-    const items=(SMALLTALK[lang]||[]).map(s=>Object.assign({kind:'suggested',note:'экзамен'},s));
-    renderLeveled(body,items);return;
-  }
-  // shadowing levels
-  let items=APP.data[lang].videos.map(v=>Object.assign({kind:'mine'},v));
-  if(favFilter)items=items.filter(v=>v.fav);
-  if(!favFilter){const mineIds=new Set(APP.data[lang].videos.map(v=>v.videoId));(SUGGESTED[lang]||[]).forEach(s=>{if(!mineIds.has(s.videoId))items.push(Object.assign({kind:'suggested'},s));});}
+  // По уровням: рекомендованный каталог
+  const items=(SUGGESTED[lang]||[]).map(s=>Object.assign({kind:'suggested'},s));
   renderLeveled(body,items);
 }
 
@@ -573,16 +651,17 @@ document.getElementById('addSave').addEventListener('click',()=>{
   APP.data[APP.lang].videos.push(v);saveApp();openVideo(v);});
 
 function openVideo(v){
-  curVideo=v;activeIndex=-1;ctrl.classList.remove('on');playlistMode=false;updatePlayerUI();
+  editScript=false;curVideo=v;activeIndex=-1;ctrl.classList.remove('on');playlistMode=false;updatePlayerUI();
   document.getElementById('editBox').classList.remove('on');document.getElementById('urlInput').value=v.url||"";
   show('screenPlayer');
   if(v.videoId){buildPlayer(v.videoId);}else document.getElementById('playerPh').classList.remove('hide');
+  document.getElementById('aiPane').style.display=v.smalltalk?'block':'none';resetAI();
   renderScript();
 }
 function openSuggested(s){
   const ex=APP.data[APP.lang].videos.find(v=>v.videoId===s.videoId);
   if(ex){openVideo(ex);return;}
-  openVideo({vid:uid(),title:s.title,topic:"",level:s.level||"",fav:false,url:"https://youtu.be/"+s.videoId,videoId:s.videoId,phrases:[],transient:true});
+  openVideo({vid:uid(),title:s.title,topic:"",level:s.level||"",fav:false,url:"https://youtu.be/"+s.videoId,videoId:s.videoId,phrases:[],transient:true,smalltalk:s.note==='экзамен'});
 }
 function persistCur(){if(curVideo&&curVideo.transient){delete curVideo.transient;APP.data[APP.lang].videos.push(curVideo);}}
 
@@ -602,7 +681,7 @@ function buildPlaylist(pid){playlistMode=true;updatePlayerUI();document.getEleme
   player=new YT.Player('player',{playerVars:{listType:'playlist',list:pid,rel:0,playsinline:1,modestbranding:1},events:ytErr()});}
 function updatePlayerUI(){document.getElementById('toTrainerBtn').style.display=playlistMode?'block':'none';
   document.getElementById('videoHint').textContent=playlistMode?"Это подборка. Листай ролики в плеере и выбирай. Понравился, нажми кнопку ниже, чтобы тренироваться по фразам.":"Нажми фразу справа, потом «Прослушать» или «Повторить».";}
-function openMedia(item){if(item.playlistId){curVideo={title:item.title,topic:"",level:"",fav:false,url:"",videoId:"",phrases:[]};activeIndex=-1;ctrl.classList.remove('on');document.getElementById('editBox').classList.remove('on');show('screenPlayer');buildPlaylist(item.playlistId);renderScript();}else openSuggested(item);}
+function openMedia(item){if(item.playlistId){editScript=false;curVideo={title:item.title,topic:"",level:"",fav:false,url:"",videoId:"",phrases:[]};activeIndex=-1;ctrl.classList.remove('on');document.getElementById('editBox').classList.remove('on');show('screenPlayer');buildPlaylist(item.playlistId);document.getElementById('aiPane').style.display='none';renderScript();}else openSuggested(item);}
 document.getElementById('toTrainerBtn').addEventListener('click',()=>{const d=(player&&player.getVideoData)?player.getVideoData():null;const id=d&&d.video_id;
   if(!id){alert("Сначала запусти ролик в плеере.");return;}
   let ex=APP.data[APP.lang].videos.find(v=>v.videoId===id);
@@ -622,11 +701,40 @@ document.getElementById('markBtn').addEventListener('click',()=>{if(!player||typ
 let segSize=1,activeIndex=-1;
 const listEl=document.getElementById('scriptList');const ctrl=document.getElementById('ctrl');
 document.getElementById('segSel').addEventListener('change',e=>{segSize=+e.target.value;if(activeIndex>=0)activate(activeIndex);});
+let editScript=false;
+function fmtTc(sec){sec=Math.max(0,Math.round(sec||0));const m=Math.floor(sec/60),s=sec%60;return m+":"+(s<10?"0":"")+s;}
 function renderScript(){listEl.innerHTML="";activeIndex=-1;ctrl.classList.remove('on');document.getElementById('count').textContent=phrases().length?phrases().length+" фраз":"";
-  if(!phrases().length){const e=document.createElement('div');e.className="script-empty";e.textContent="Скрипта нет. Открой «⚙ изменить ссылку и скрипт» и вставь расшифровку.";listEl.appendChild(e);return;}
+  const eb=document.getElementById('editScriptBtn');
+  if(!phrases().length){editScript=false;if(eb)eb.style.display='none';const e=document.createElement('div');e.className="script-empty";e.textContent="Скрипта нет. Открой «⚙ изменить ссылку и скрипт» и вставь расшифровку.";listEl.appendChild(e);return;}
+  if(eb){eb.style.display='inline-block';eb.textContent=editScript?"✓ готово":"✏ редактировать";}
+  if(editScript){renderScriptEdit();return;}
   phrases().forEach((p,i)=>{const line=document.createElement('div');line.className="line";line.dataset.i=i;
     if(p.text){p.text.split(/\s+/).forEach(w=>{const s=document.createElement('span');s.className="w";s.textContent=w+" ";line.appendChild(s);});}else{line.classList.add('empty');line.textContent="(нет текста, нажми чтобы вписать)";}
     line.addEventListener('click',()=>{if(p.text===""){const t=prompt("Текст фразы:");if(t!==null){p.text=t;saveApp();renderScript();}return;}activate(i);});listEl.appendChild(line);});}
+function renderScriptEdit(){
+  phrases().forEach((p,i)=>{
+    const row=document.createElement('div');row.className="line-edit";
+    const ta=document.createElement('textarea');ta.className="ph-text";ta.value=p.text||"";ta.rows=Math.max(1,Math.ceil(((p.text||"").length+1)/38));
+    ta.addEventListener('input',()=>{p.text=ta.value;});
+    ta.addEventListener('blur',()=>{persistCur();saveApp();});
+    row.appendChild(ta);
+    const tools=document.createElement('div');tools.className="ph-tools";
+    const tc=document.createElement('input');tc.className="ph-tc";tc.value=fmtTc(p.t);tc.title="время начала, м:сс";
+    tc.addEventListener('change',()=>{const sec=tcToSec(tc.value.trim());if(sec!==null){p.t=sec;persistCur();saveApp();}});
+    tools.appendChild(tc);
+    const sp=document.createElement('button');sp.className="ph-btn";sp.textContent="разделить здесь";
+    sp.addEventListener('click',()=>{const pos=ta.selectionStart;if(pos<=0||pos>=ta.value.length){alert("Поставь курсор в тексте там, где нужно разделить фразу.");return;}const a=ta.value.slice(0,pos).trim(),b=ta.value.slice(pos).trim();p.text=a;curVideo.phrases.splice(i+1,0,{t:p.t,text:b});persistCur();saveApp();renderScript();});
+    tools.appendChild(sp);
+    const del=document.createElement('button');del.className="ph-btn del";del.textContent="удалить";
+    del.addEventListener('click',()=>{curVideo.phrases.splice(i,1);persistCur();saveApp();renderScript();});
+    tools.appendChild(del);
+    row.appendChild(tools);listEl.appendChild(row);
+  });
+  const add=document.createElement('button');add.className="ph-btn add";add.textContent="+ добавить фразу";
+  add.addEventListener('click',()=>{const last=phrases()[phrases().length-1];curVideo.phrases.push({t:last?last.t:0,text:""});persistCur();saveApp();renderScript();});
+  listEl.appendChild(add);
+}
+document.getElementById('editScriptBtn').addEventListener('click',()=>{editScript=!editScript;if(!editScript&&curVideo&&curVideo.phrases){curVideo.phrases.sort((a,b)=>a.t-b.t);persistCur();saveApp();}renderScript();});
 function activeLines(){const a=[];for(let k=activeIndex;k<Math.min(activeIndex+segSize,phrases().length);k++)a.push(k);return a;}
 function segText(){return activeLines().map(k=>phrases()[k].text).join(' ').trim();}
 function activate(i){if(recognizing)stopRepeat();document.querySelectorAll('.line').forEach(l=>{l.classList.remove('active');l.querySelectorAll('.w').forEach(w=>w.classList.remove('ok','miss'));});
@@ -668,6 +776,57 @@ function cleanPitch(){let a=pitchRaw.slice();const voiced=a.filter(v=>v);if(voic
 function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.clearRect(0,0,w,h);const valid=pts.filter(v=>v);if(valid.length<3){ctx2.fillStyle="#c0b3a4";ctx2.font="20px -apple-system,sans-serif";ctx2.fillText("нет звука, скажи громче",20,h/2);return;}
   const mn=Math.min(...valid),mx=Math.max(...valid),rng=Math.max(15,mx-mn);const xy=[];pts.forEach((v,i)=>{if(v)xy.push({x:(i/(pts.length-1))*(w-24)+12,y:h-18-((v-mn)/rng)*(h-36),i});});
   ctx2.strokeStyle="#6e1d2a";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
+
+/* ---- Small talk: проверка ответа ИИ (Google Gemini) ---- */
+let aiRec=null,aiChunks=[],aiBlob=null,aiBusy=false;
+function resetAI(){aiBlob=null;aiChunks=[];if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}aiRec=null;
+  const b=document.getElementById('aiRecBtn');if(b){b.textContent="🎙 Записать ответ";b.classList.remove('rec');}
+  const c=document.getElementById('aiCheckBtn');if(c)c.style.display='none';
+  const a=document.getElementById('aiAudio');if(a){a.style.display='none';a.removeAttribute('src');}
+  const s=document.getElementById('aiStatus');if(s)s.textContent="";
+  const f=document.getElementById('aiFeedback');if(f)f.innerHTML="";}
+function aiPickMime(){const t=['audio/ogg;codecs=opus','audio/webm;codecs=opus','audio/mp4','audio/webm'];for(const m of t){if(window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))return m;}return '';}
+async function aiStartRec(){
+  const st=document.getElementById('aiStatus');
+  try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    aiChunks=[];const mime=aiPickMime();
+    aiRec=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);
+    aiRec.ondataavailable=e=>{if(e.data&&e.data.size)aiChunks.push(e.data);};
+    aiRec.onstop=()=>{aiBlob=new Blob(aiChunks,{type:(aiRec&&aiRec.mimeType)||'audio/webm'});stream.getTracks().forEach(t=>t.stop());
+      const a=document.getElementById('aiAudio');a.src=URL.createObjectURL(aiBlob);a.style.display='block';
+      document.getElementById('aiCheckBtn').style.display='inline-block';
+      document.getElementById('aiStatus').textContent="Готово. Прослушай себя и нажми «Проверить у ИИ».";};
+    aiRec.start();
+    const b=document.getElementById('aiRecBtn');b.textContent="⏹ Стоп";b.classList.add('rec');
+    st.textContent="Идёт запись… говори ответ, потом нажми «Стоп».";
+  }catch(e){st.textContent="Нет доступа к микрофону. Разреши доступ в браузере и попробуй снова.";}
+}
+function aiStopRec(){if(aiRec&&aiRec.state&&aiRec.state!=='inactive'){try{aiRec.stop();}catch(e){}}const b=document.getElementById('aiRecBtn');b.textContent="🎙 Записать ответ";b.classList.remove('rec');}
+function aiBlobToB64(blob){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});}
+const AI_MODEL="gemini-2.0-flash";
+function aiExam(lang){return lang==='en'?"IELTS Speaking (английский)":lang==='es'?"DELE/SIELE (испанский)":"Goethe/telc (немецкий)";}
+async function aiCheck(){
+  if(aiBusy)return;const st=document.getElementById('aiStatus'),fb=document.getElementById('aiFeedback');
+  const key=(APP.aikey||'').trim();
+  if(!key){st.textContent="Сначала добавь ключ ИИ: кружок профиля слева → «Ключ ИИ» → вставь и сохрани.";return;}
+  if(!aiBlob){st.textContent="Сначала запиши ответ кнопкой «Записать ответ».";return;}
+  aiBusy=true;st.textContent="Отправляю ответ на проверку, подожди несколько секунд…";fb.innerHTML="";
+  try{
+    const b64=await aiBlobToB64(aiBlob);const mime=(aiBlob.type||'audio/webm').split(';')[0];
+    const lang=APP.lang;const examName=aiExam(lang);
+    const prompt="Ты — доброжелательный экзаменатор по "+examName+". На аудио устный ответ кандидата, язык ответа: "+LANGS[lang].name+". Сделай разбор НА РУССКОМ языке, кратко и по делу, строго в таком порядке:\n1) Что услышал — короткая расшифровка ответа на языке оригинала.\n2) Примерный уровень или балл (IELTS band или CEFR A1-C2).\n3) Сильные стороны: 1-2 пункта.\n4) Ошибки и исправления: 3-5 примеров в формате «было → стало» на языке ответа.\n5) Один совет, как ответить лучше.\nБез вступления, сразу по пунктам.";
+    const url="https://generativelanguage.googleapis.com/v1beta/models/"+AI_MODEL+":generateContent?key="+encodeURIComponent(key);
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:mime,data:b64}}]}]})});
+    const data=await r.json();
+    if(!r.ok){st.textContent="Ошибка ИИ: "+((data&&data.error&&data.error.message)||r.status);aiBusy=false;return;}
+    let out="";try{out=data.candidates[0].content.parts.map(p=>p.text||'').join('');}catch(e){out="";}
+    if(!out){st.textContent="ИИ не вернул разбор. Попробуй ещё раз или запиши ответ заново.";aiBusy=false;return;}
+    st.textContent="";fb.textContent=out;
+  }catch(e){st.textContent="Не получилось связаться с ИИ. Проверь интернет и ключ.";}
+  aiBusy=false;
+}
+document.getElementById('aiRecBtn').addEventListener('click',()=>{if(aiRec&&aiRec.state==='recording')aiStopRec();else aiStartRec();});
+document.getElementById('aiCheckBtn').addEventListener('click',aiCheck);
 
 loadApp();buildLangMenu();renderHome();initAuth();
 </script>
