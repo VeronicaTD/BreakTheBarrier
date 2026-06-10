@@ -41,6 +41,11 @@
   textarea{min-height:120px;resize:vertical;font-size:14px;line-height:1.45}
   input:focus,button:focus-visible,textarea:focus,select:focus{outline:3px solid var(--accent-soft);outline-offset:1px;border-color:var(--accent)}
   .screen{display:none}
+  .auth-card{max-width:380px;margin:9vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 8px 30px rgba(60,30,20,.08)}
+  .auth-title{font-family:"Yeseva One",Georgia,serif;font-size:28px;color:var(--accent);margin-bottom:8px}
+  .auth-sub{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.45}
+  .auth-card input{width:100%;padding:11px 13px;font-size:15px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);margin-bottom:10px}
+  .auth-msg{font-size:13px;color:var(--accent-ink);min-height:18px;margin:2px 0 10px}
   .screen.on{display:block}
   .home-hero{margin:14px 0 8px}
   .home-hero .h1{font-size:42px;font-weight:800;line-height:1.12}
@@ -69,6 +74,14 @@
   .lvl-group{margin-bottom:24px}
   .lvl-name{font-size:13px;font-weight:700;letter-spacing:.05em;color:var(--accent);margin-bottom:10px}
   .vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+  .carousel{position:relative}
+  .carousel .arrow{position:absolute;top:52px;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(60,40,30,.18)}
+  .carousel .arrow.left{left:-6px}
+  .carousel .arrow.right{right:-6px}
+  .vid-grid.row{display:flex;grid-template-columns:none;gap:12px;overflow-x:auto;padding:2px 2px 10px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .vid-grid.row::-webkit-scrollbar{height:6px}
+  .vid-grid.row::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+  .vid-grid.row .vid-card{flex:0 0 185px;scroll-snap-align:start}
   .vid-card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;transition:transform .12s,border-color .12s}
   .vid-card:hover{transform:translateY(-2px);border-color:var(--accent-soft)}
   .thumb{width:100%;aspect-ratio:16/9;background:#3a2630 center/cover no-repeat;position:relative}
@@ -145,6 +158,18 @@
     <span class="spacer"></span>
     <div class="lang-wrap"><button class="lang-circle" id="cloudCircle" style="display:none">☁</button><div class="lang-menu" id="cloudMenu" style="min-width:250px;padding:14px"></div></div>
     <div class="lang-wrap"><button class="lang-circle" id="langCircle" style="display:none">🌐</button><div class="lang-menu" id="langMenu"></div></div>
+  </div>
+
+  <div class="screen" id="screenAuth">
+    <div class="auth-card">
+      <div class="auth-title">BreakTheBarrier</div>
+      <div class="auth-sub">Создай профиль или войди, и твоя библиотека будет с тобой на любом устройстве.</div>
+      <input type="text" id="authEmail" placeholder="почта" autocomplete="email">
+      <input type="password" id="authPass" placeholder="пароль (от 6 символов)" autocomplete="current-password">
+      <div class="auth-msg" id="authMsg"></div>
+      <button class="btn-main" id="signInBtn" style="width:100%">Войти</button>
+      <button class="btn-ghost" id="signUpBtn" style="width:100%;margin-top:8px">Создать аккаунт</button>
+    </div>
   </div>
 
   <div class="screen" id="screenHome">
@@ -228,8 +253,110 @@ const LEVELS=["A1","A2","B1","B2","C1","C2"];
 
 /* SHADOWING: учебные ролики по уровням (реальные, язык проверен) */
 const SUGGESTED={
-  en:[],
-  es:[],
+  en:[
+    {title:"How to introduce yourself: Easy English",videoId:"I_tRSrPru94",level:"A1",desc:"Как познакомиться, назвать имя и начать короткий разговор. Хороший старт для тех, кто только начинает говорить."},
+    {title:"How to talk about your daily routine",videoId:"bq6GBbh3uhU",level:"A1",desc:"Распорядок дня: что человек делает утром, днём и вечером. Базовая лексика про обычную жизнь."},
+    {title:"Talking about food — Real Easy English",videoId:"4C4wlOAscvY",level:"A1",desc:"Небольшой разговор о любимой еде и привычках в питании. Простые бытовые диалоги."},
+    {title:"Talking about mistakes — Real Easy English",videoId:"eK5Tsornvng",level:"A1",desc:"Лёгкий разговор о ситуациях, когда что-то пошло не так. Фразы для рассказа о личном опыте."},
+    {title:"Learning English — Lesson One",videoId:"ohJCdihPWqc",level:"A1",desc:"Классический вводный урок: спокойная подача, базовые советы и простые фразы для старта."},
+    {title:"60 Minutes of Simple English Conversations",videoId:"Xr7pw8bde_8",level:"A1",desc:"Подборка простых диалогов на каждый день. Много лёгкой практики в одном видео."},
+    {title:"How to Learn English: for Beginners!",videoId:"AaRhgWg2R4o",level:"A1",desc:"Понятные советы для тех, кто только начинает и не знает, с чего двигаться дальше."},
+    {title:"Beginner English Podcast (British) — Clothes",videoId:"5mK7GTQYKFY",level:"A1",desc:"Медленный подкаст о теме одежды. Британское произношение и базовая лексика."},
+    {title:"How to Ask and Give Directions in English",videoId:"4ahsTLM3QAU",level:"A1",desc:"Как спросить дорогу и объяснить маршрут. Полезно для путешествий и ситуаций в городе."},
+    {title:"Job Interview English Conversation",videoId:"V4wy46dI2_k",level:"A1",desc:"Простая сценка про собеседование. Базовые фразы для разговора о работе."},
+    {title:"A2 English Listening Practice",videoId:"FtqbKDuS_ew",level:"A2",desc:"Спокойная практика аудирования для тех, кто уже понимает простые фразы и хочет связнее."},
+    {title:"Easy English Listening — The Media",videoId:"vSUQ2-7XDL0",level:"A2",desc:"О медиа и информации в простой форме. Словарь на современные бытовые темы."},
+    {title:"Slow Daily English Conversation",videoId:"9n7ItZ7v15Y",level:"A2",desc:"Медленный разговорный английский для повседневных ситуаций, без резкого темпа."},
+    {title:"Talk About Your Morning Routine",videoId:"BZObLA7OxX8",level:"A2",desc:"Как рассказать о своём утре. Тема рутины, привычек и простых действий."},
+    {title:"THINK and SPEAK in English",videoId:"m3NC3OZ8W-E",level:"A2",desc:"Как уходить от перевода в голове и строить простые мысли сразу на английском."},
+    {title:"Real English Conversation: Daily Vocabulary",videoId:"EsVaXsNNASc",level:"A2",desc:"Живой разговор с повседневной лексикой. Переход к более естественной речи."},
+    {title:"Speak With Me: English Speaking Practice",videoId:"tnHANfZHKqQ",level:"A2",desc:"Практика говорения: повторяешь фразы вслух и тренируешь простые ответы."},
+    {title:"Learn English with Slow Podcast (A1-A2)",videoId:"XCPIed7AUGI",level:"A2",desc:"Медленный подкаст для начинающих: слушаешь, повторяешь, привыкаешь к ритму речи."},
+    {title:"30 Minutes of English Conversation Practice",videoId:"gW4JxtwMHr0",level:"A2",desc:"Подборка простых разговоров: покупки, встречи, просьбы, короткие ответы."},
+    {title:"Easy English Stories 2",videoId:"Cyb-K-Tat1E",level:"A2",desc:"Несколько простых историй для понимания и повторения фраз. Учёба через маленькие сюжеты."},
+    {title:"Why the Dutch always say what they mean — BBC",videoId:"wrEZwe1nbBU",level:"B1",desc:"Короткий BBC-ролик о культурной прямоте: почему голландцы говорят прямо. Тема культуры и общения."},
+    {title:"How stories shape our minds — BBC Ideas",videoId:"vyZMSZG2Dmk",level:"B1",desc:"Как истории влияют на мышление. Психология, сторителлинг и понятные объяснения."},
+    {title:"Why do we have so much stuff? — BBC Ideas",videoId:"KtWlmbDsx-U",level:"B1",desc:"О вещах, покупках и привычке копить лишнее. Заставляет задуматься о современной жизни."},
+    {title:"Do we think differently in different languages?",videoId:"XINQvKbqzq0",level:"B1",desc:"Может ли язык менять мышление и восприятие мира. Для тех, кому интересны языки."},
+    {title:"How to manage your emotions — TED-Ed",videoId:"Uew5BbvmLks",level:"B1",desc:"Анимация о том, как понимать и регулировать эмоции. Визуальный формат помогает с лексикой."},
+    {title:"Is Binge Watching Bad For You? — TED-Ed",videoId:"KJRzgl0FuMA",level:"B1",desc:"Как просмотр сериалов запоем влияет на человека. Современные темы и медиа."},
+    {title:"How to stay calm under pressure — TED-Ed",videoId:"CqgmozFr_GM",level:"B1",desc:"Как сохранять спокойствие в стрессе. Тема психологии и самоконтроля."},
+    {title:"What Orwellian really means — TED-Ed",videoId:"oe64p-QzhNE",level:"B1",desc:"Что на самом деле означает слово «Orwellian». Литература, история и культурные понятия."},
+    {title:"George Orwell 1984: Why it still matters — BBC",videoId:"eFvuzu8vtY8",level:"B1",desc:"Почему роман «1984» до сих пор важен. Для интересующихся литературой и обществом."},
+    {title:"The best way to become good at something — TED-Ed",videoId:"jLOuMXnM5wk",level:"B1",desc:"Как люди развивают навыки и почему путь к успеху не прямой. Тема обучения."},
+    {title:"Do schools kill creativity? — Ken Robinson (TED)",videoId:"iG9CE55wbtY",level:"B2",desc:"Одно из самых известных TED об образовании и творчестве: почему школа не всегда раскрывает способности."},
+    {title:"Your body language may shape who you are (TED)",videoId:"Ks-_Mh1QhMc",level:"B2",desc:"О языке тела и уверенности: как поза влияет на состояние и восприятие себя."},
+    {title:"Inside the mind of a master procrastinator (TED)",videoId:"arj7oStGLkU",level:"B2",desc:"Живое и смешное выступление о прокрастинации, дедлайнах и логике мозга."},
+    {title:"The danger of a single story — Adichie (TED)",videoId:"D9Ihs241zeg",level:"B2",desc:"О стереотипах и культуре: почему нельзя судить о людях по одной истории."},
+    {title:"How great leaders inspire action — Sinek (TED)",videoId:"qp0HIF3SfI4",level:"B2",desc:"О лидерстве, мотивации и силе вопроса «почему». Бизнес, идеи и выступления."},
+    {title:"What happens when you reply to spam — Veitch (TED)",videoId:"_QdPW8JrYzQ",level:"B2",desc:"Смешное выступление о переписке со спамерами. Живой юмор и реакции зала."},
+    {title:"The secret to desire in a relationship — Perel (TED)",videoId:"sa0RUmGTCYY",level:"B2",desc:"О близости, отношениях и желаниях. Тема взрослая, живая и психологически глубокая."},
+    {title:"How to embrace emotions at work (TED)",videoId:"sSOBk0v0viM",level:"B2",desc:"Почему эмоции нельзя просто выключить на работе. Эмоциональный интеллект."},
+    {title:"Why we have too few women leaders — Sandberg (TED)",videoId:"18uDutylDa4",level:"B2",desc:"О лидерстве, карьере и барьерах для женщин. Обсуждение общества и работы."},
+    {title:"How to speak so that people want to listen (TED)",videoId:"eIho2S0ZahI",level:"B2",desc:"О голосе и речи: как говорить убедительно. Коммуникация и публичные выступления."},
+    {title:"The power of vulnerability — Brené Brown (TED)",videoId:"iCvmsMzlF7o",level:"C1",desc:"Глубокое выступление об уязвимости, стыде и близости. Эмоционально сложная речь."},
+    {title:"What makes a good life? — Waldinger (TED)",videoId:"8KkKuTCFvzI",level:"C1",desc:"О счастье и отношениях: выводы самого долгого исследования человеческой жизни."},
+    {title:"A stroke of insight — Jill Bolte Taylor (TED)",videoId:"UyyjU8fzEYU",level:"C1",desc:"Нейробиолог о собственном инсульте и работе мозга изнутри. Сильная тема."},
+    {title:"The potential of SixthSense technology (TED)",videoId:"YrtANPtnhyg",level:"C1",desc:"О технологиях, интерфейсах и будущем взаимодействия человека с информацией."},
+    {title:"The puzzle of motivation — Dan Pink (TED)",videoId:"rrkrvAUbU9Y",level:"C1",desc:"О мотивации и работе: почему привычные награды не всегда помогают."},
+    {title:"How Common Knowledge Shapes the World — Pinker (TED)",videoId:"GZKU7TgR6IU",level:"C1",desc:"Продвинутое выступление о том, как общее знание влияет на общество, нормы и власть."},
+    {title:"The battle for reality: Why science matters",videoId:"e7FWMl771zQ",level:"C1",desc:"О науке, фактах и эмоциях: почему трудно отличать правду от удобных убеждений."},
+    {title:"Antikythera Mechanism — BBC Reel",videoId:"qqlJ50zDgeA",level:"C1",desc:"О древнем механизме, который называют первым аналоговым компьютером. История и наука."},
+    {title:"Unique Creatures of our Hidden Forests — BBC Earth",videoId:"7p5QctXvusY",level:"C1",desc:"Документальный ролик о необычных животных скрытых лесов. Природная и научная лексика."},
+    {title:"Breathtaking Moments from Planet Earth — BBC Earth",videoId:"7EMynhUaHso",level:"C1",desc:"Подборка впечатляющих моментов из мира природы. Красивая научно-популярная речь."}
+  ],
+  es:[
+    {title:"Spanish for Beginners: Lost in NYC",videoId:"p5ZHNWifka4",level:"A1",desc:"Простая история о поездке в Нью-Йорк, где всё идёт не по плану. Для первого спокойного аудирования на испанском."},
+    {title:"Learn Spanish in Nature",videoId:"i0x0DHYnou8",level:"A1",desc:"Прогулка по парку с простыми описаниями природы, предметов и действий. Привыкаешь к речи без сложной грамматики."},
+    {title:"Easy Spanish: Natalia's Daily Life",videoId:"V05jPrYAa_o",level:"A1",desc:"Небольшой рассказ о повседневной жизни. Простые фразы о доме, делах и обычном дне."},
+    {title:"Mi Ciudad / Comprehensible Input",videoId:"zssx7Kpoc1o",level:"A1",desc:"О городе, местах и личных впечатлениях. Для тех, кто только начинает понимать испанский на слух."},
+    {title:"Mi Perro / Comprehensible Input",videoId:"H5JN8Kv5X2k",level:"A1",desc:"Простое видео о собаке и повседневных ситуациях. Лёгкая тема и базовая лексика."},
+    {title:"Learn Spanish | House Activities",videoId:"E2UrFy1iMBU",level:"A1",desc:"О домашних делах и предметах в доме. Испанский через понятные бытовые действия."},
+    {title:"Spanish Story: The Fortune Teller",videoId:"aVROKKwcQL8",level:"A1",desc:"Простая история с небольшим сюжетом о гадалке. Учишься понимать маленький рассказ, а не отдельные слова."},
+    {title:"Beginner Spanish: Crazy at the Pharmacy",videoId:"kvBrWssATAc",level:"A1",desc:"Лёгкая история о ситуации в аптеке. Базовые фразы для повседневного общения."},
+    {title:"Beginner Spanish: Nightmare at the Bank",videoId:"-BJfyi_PS50",level:"A1",desc:"Простая история о неприятной ситуации в банке. Бытовая лексика и короткий сюжет."},
+    {title:"How to Survive a Long Flight",videoId:"5EIlaOWF5fw",level:"A1",desc:"О перелёте и путешествии. Лексика про дорогу, аэропорт и простые проблемы в поездке."},
+    {title:"Beginner Spanish: The Engagement Ring",videoId:"R3_v_pADArQ",level:"A2",desc:"История о помолвочном кольце и неожиданной ситуации. Для тех, кто хочет больше сюжета."},
+    {title:"Beginner Spanish: Broke at the Luxury Store",videoId:"jrRJQBB4oKs",level:"A2",desc:"Лёгкая история о походе в дорогой магазин. Много понятного контекста, эмоций и фраз."},
+    {title:"Beginner Spanish: I Can't Go to School!",videoId:"SLgVwNulYhc",level:"A2",desc:"Школьная ситуация и причина пропуска занятий. Тема школы и обычного дня."},
+    {title:"Spanish Story: The Nightmare",videoId:"4hGfVk0VAGA",level:"A2",desc:"Простая история с тревожным, но понятным сюжетом. Привыкаешь к повествованию на испанском."},
+    {title:"Beginner Spanish: The Chocolate Cake",videoId:"_raLMEnUGbI",level:"A2",desc:"История о шоколадном торте и бытовой ситуации. Лёгкий сюжет и знакомая лексика."},
+    {title:"A1-A2 Spanish: Confused at Starbucks!",videoId:"KwwlRhFhF5I",level:"A2",desc:"Ситуация в кафе, где герой путается при заказе. Тема еды, напитков и общения."},
+    {title:"25 Minutes of Easy Spanish Dialogues",videoId:"Zucm_QLTkkQ",level:"A2",desc:"Подборка простых диалогов на каждый день. Несколько бытовых ситуаций подряд."},
+    {title:"Slow Spanish Podcast — At the Supermarket",videoId:"YvM8jZXMKG8",level:"A2",desc:"Медленный выпуск о походе в супермаркет. Лексика по теме еды, покупок и магазина."},
+    {title:"Learn Spanish with Repetition",videoId:"lZXrGDXsD-4",level:"A2",desc:"Повторения помогают привыкнуть к фразам без спешки. Слышишь одни конструкции несколько раз."},
+    {title:"An Easy Vlog to Learn Spanish",videoId:"s2MdyyufxW8",level:"A2",desc:"Спокойный влог с понятным контекстом. Переход от учебных историй к живой речи."},
+    {title:"This is a VLOG to Learn Spanish",videoId:"j3IdPhEY1DQ",level:"B1",desc:"Живой влог для тренировки испанского в естественном контексте. Уход от учебных диалогов."},
+    {title:"Practice Spanish with this VLOG",videoId:"4JC4_8JRISs",level:"B1",desc:"Влог о прогулке и небольшом проекте. Живая речь, описание мест и впечатлений."},
+    {title:"Learn Spanish While Cooking Pasticho",videoId:"T54GqOuwH4Q",level:"B1",desc:"Испанский во время готовки. Формат «смотрю и понимаю по действиям»."},
+    {title:"I visited my family in Venezuela",videoId:"fAZxbiNXskM",level:"B1",desc:"Влог о поездке к семье в Венесуэлу. Много живого контекста и семейной лексики."},
+    {title:"I went to a beautiful beach in Spain",videoId:"v7Mnk1FdjOg",level:"B1",desc:"Влог о поездке на пляж в Испании. Темы путешествий, природы и впечатлений."},
+    {title:"Spanish Vlog | Viajar conmigo a Japón",videoId:"N8m3--Z9TWE",level:"B1",desc:"Влог о путешествии в Японию на испанском. Не только про Испанию и Латинскую Америку."},
+    {title:"Lots of Spanish vocabulary but can't speak?",videoId:"ZPcRAR1ffmM",level:"B1",desc:"О типичной проблеме: слов много, а говорить сложно. Многие узнают себя."},
+    {title:"Intermediate Spanish | La Vecina",videoId:"1AYtrfuwHxo",level:"B1",desc:"История о соседке и бытовой проблеме. Лексика о доме, соседях и небольших конфликтах."},
+    {title:"Test Your Spanish Listening: Full Story",videoId:"Dy_oIzZNLfI",level:"B1",desc:"Связная история для проверки понимания на слух. Оцениваешь, сколько реально понимаешь."},
+    {title:"B1 Spanish Stories (подборка)",playlistId:"PLzVxI9t-AP52Ou_v9zwUpa0gss6BqFbDV",level:"B1",note:"подборка",desc:"Подборка историй для среднего уровня. Регулярное аудирование через сюжеты."},
+    {title:"TEDx: Europe, how to unleash a common spirit | Florian Mück",videoId:"XM9CPSHVOT8",level:"B2",desc:"О Европе, общей идее и чувстве единства. Темы культуры, общества и идентичности."},
+    {title:"TEDxBuenosAires | Luis Pescetti",videoId:"KTpChP26scI",level:"B2",desc:"Живое выступление с культурной подачей. Речь с интонацией и характером, не сухая лекция."},
+    {title:"Jaime Lerner | TEDxBuenosAires",videoId:"lXGY0X-wdjI",level:"B2",desc:"Об урбанистике, городе и общественном пространстве. Как среда влияет на людей."},
+    {title:"Digital Invaders | Daniel Granatta",videoId:"XvyQopQTGpk",level:"B2",desc:"О цифровой среде и технологиях и о том, как они меняют жизнь. Современные темы."},
+    {title:"Aprendizaje invisible | Cristóbal Cobo",videoId:"9E_BH00dkJk",level:"B2",desc:"Об образовании за пределами привычной школы. Педагогика, технологии и будущее обучения."},
+    {title:"Rafael Spregelburd | TEDxBuenosAires",videoId:"8EEZdO0KAGo",level:"B2",desc:"О культуре, театре и мышлении. Интеллектуальные, но не научно-тяжёлые темы."},
+    {title:"Miguel Brechner Frey | TEDxBuenosAires",videoId:"AWOpCDBuhgs",level:"B2",desc:"О социальных изменениях и образовании. Проекты, которые меняют жизнь людей."},
+    {title:"Gabriel Gellon | TEDxBuenosAires",videoId:"oLfO34LmEJg",level:"B2",desc:"Научно-образовательная тема. Переход от бытового испанского к объяснению идей."},
+    {title:"José Cibelli | TEDxBuenosAires",videoId:"uNymCk82yQ4",level:"B2",desc:"Выступление с рассуждением и авторской позицией. Тренировка понимания аргументации."},
+    {title:"Bea Pellizzari | TEDxBuenosAires",videoId:"lBS4T3NfZbM",level:"B2",desc:"Социальное выступление о человеке, возможностях и включённости. Темы силы и общества."},
+    {title:"Los genes, la evolución y nosotros | Kornblihtt",videoId:"fnG4I3hBJKY",level:"C1",desc:"Научное выступление о генах, эволюции и человеке. Сложный испанский с научной лексикой."},
+    {title:"Luis Moreno Ocampo | TEDxBuenosAires",videoId:"-H8iLYdn21Y",level:"C1",desc:"О праве, политике и ответственности. Сложная общественная лексика."},
+    {title:"Mariano Sigman | TEDxBuenosAires",videoId:"1y8hiuBUnV8",level:"C1",desc:"О мышлении, мозге и работе сознания. Нейронаука, психология и сложные объяснения."},
+    {title:"Matías Zaldarriaga | TEDxBuenosAires",videoId:"fPk9WKllCbE",level:"C1",desc:"Высокая смысловая плотность и небытовая тема. Тренировка продвинутого аудирования."},
+    {title:"Constanza Ceruti | TEDxBuenosAires",videoId:"l9283Z0bmjM",level:"C1",desc:"Научно-культурное выступление об исследованиях и истории. Археология и экспедиции."},
+    {title:"What's on the minds of poor people? | Mayra Arena",videoId:"4JDu69Jy41Y",level:"C1",desc:"Сильное социальное выступление о бедности, стереотипах и жизни людей."},
+    {title:"Cómo nos manipulan en las redes | Santiago Bilinkis",videoId:"8nKCA9h-7BA",level:"C1",desc:"О соцсетях, внимании и механизмах влияния. Технологии, медиа и критическое мышление."},
+    {title:"Unique B2-C1 Advanced Spanish Reading Texts",videoId:"whrkPCU6zFA",level:"C1",desc:"Работа с текстом и сложной лексикой. Не только аудирование, но и письменная речь."},
+    {title:"Fire and Science: the Secrets of Gunpowder",videoId:"RIHt8G-jb2o",level:"C1",desc:"Научно-историческая тема о порохе, огне и технологиях. Необычные темы на испанском."},
+    {title:"C1 Advanced Spanish Quiz | Opinions & nuance",videoId:"XXf6CcksbAk",level:"C1",desc:"Проверка продвинутого испанского: оттенки мнения, контраст, точность формулировок."}
+  ],
   de:[
     {title:"Lederhose 2.0",videoId:"WIHcCjrjm_U",level:"B2",desc:"О немецкой культуре, традициях и современном взгляде на привычные символы. Про идентичность, юмор и стереотипы."},
     {title:"Hör! Mir! Zu! Warum wir gute Kommunikation lieben",videoId:"VNZPM1qvce0",level:"B2",desc:"Почему людям важно быть услышанными. Немецкий на тему общения, внимания и человеческого контакта."},
@@ -307,41 +434,52 @@ function thumb(id){return id?"https://img.youtube.com/vi/"+id+"/hqdefault.jpg":"
 const SB_URL="https://fnmxgojqdenmtobzlnhi.supabase.co";
 const SB_KEY="sb_publishable_zDh9jivsCq5k3ErIXSeHlg_SWTsZ8Ar";
 let sb=null;try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY);}catch(e){}
-let userId=localStorage.getItem('btb_uid');if(!userId){userId=uid()+uid();localStorage.setItem('btb_uid',userId);}
+let userId=null,userEmail=null;
 let cloudTimer=null;
-function scheduleCloud(){if(!sb)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudSave,1500);}
-async function cloudSave(){if(!sb)return;try{await sb.from('app_state').upsert({id:userId,data:APP});}catch(e){}}
+function scheduleCloud(){if(!sb||!userId)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudSave,1500);}
+async function cloudSave(){if(!sb||!userId)return;try{await sb.from('app_state').upsert({id:userId,data:APP});}catch(e){}}
 async function cloudLoad(id){if(!sb)return null;try{const r=await sb.from('app_state').select('data').eq('id',id).maybeSingle();return r&&r.data?r.data.data:null;}catch(e){return null;}}
 const cloudMenu=document.getElementById('cloudMenu');
-document.getElementById('cloudCircle').addEventListener('click',(e)=>{e.stopPropagation();buildCloudMenu();cloudMenu.classList.toggle('on');});
+document.getElementById('cloudCircle').addEventListener('click',(e)=>{e.stopPropagation();buildProfileMenu();cloudMenu.classList.toggle('on');});
 document.addEventListener('click',()=>cloudMenu.classList.remove('on'));
-function buildCloudMenu(){
+function updateProfileCircle(){document.getElementById('cloudCircle').textContent=userEmail?userEmail[0].toUpperCase():"👤";}
+function buildProfileMenu(){
   cloudMenu.innerHTML="";
-  const t=document.createElement('div');t.style.cssText="font-size:13px;color:var(--muted);margin-bottom:8px";
-  t.textContent=sb?"Твой код. Сохрани его, чтобы открыть свою библиотеку на другом устройстве или восстановить.":"Облако недоступно. Открой сайт на Netlify.";
-  cloudMenu.appendChild(t);
-  if(!sb)return;
-  const code=document.createElement('div');code.style.cssText="font-weight:700;word-break:break-all;background:var(--paper);border-radius:8px;padding:8px;font-size:13px;margin-bottom:8px";code.textContent=userId;cloudMenu.appendChild(code);
-  const copy=document.createElement('button');copy.className="btn-sec";copy.style.width="100%";copy.textContent="Копировать код";
-  copy.addEventListener('click',(e)=>{e.stopPropagation();try{navigator.clipboard.writeText(userId);}catch(_){}copy.textContent="Скопировано";});cloudMenu.appendChild(copy);
-  const inp=document.createElement('input');inp.type="text";inp.placeholder="вставь код с другого устройства";inp.style.cssText="width:100%;margin-top:12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px";inp.addEventListener('click',e=>e.stopPropagation());cloudMenu.appendChild(inp);
-  const load=document.createElement('button');load.className="btn-ghost";load.style.cssText="width:100%;margin-top:8px";load.textContent="Открыть по коду";
-  load.addEventListener('click',async(e)=>{e.stopPropagation();const id=inp.value.trim();if(!id)return;load.textContent="Загружаю...";const d=await cloudLoad(id);
-    if(d){APP=d;userId=id;localStorage.setItem('btb_uid',id);saveApp();cloudMenu.classList.remove('on');
-      if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else{renderHome();show('screenHome');}}
-    else load.textContent="Не найдено. На первом устройстве открой ☁ ещё раз и убедись, что код тот же";});
-  cloudMenu.appendChild(load);
-  const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:12px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
+  const t=document.createElement('div');t.style.cssText="font-size:13px;color:var(--muted);margin-bottom:4px";t.textContent="Профиль";cloudMenu.appendChild(t);
+  const em=document.createElement('div');em.style.cssText="font-weight:700;word-break:break-all;font-size:14px;margin-bottom:12px";em.textContent=userEmail||"локальный режим";cloudMenu.appendChild(em);
+  const out=document.createElement('button');out.className="btn-sec";out.style.width="100%";out.textContent="Выйти";
+  out.addEventListener('click',(e)=>{e.stopPropagation();doSignOut();});cloudMenu.appendChild(out);
+  const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:10px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
   clr.addEventListener('click',(e)=>{e.stopPropagation();if(confirm("Удалить все ролики, которые ты добавляла или открывала? Встроенные рекомендации останутся.")){APP.data={en:{videos:[]},es:{videos:[]},de:{videos:[]}};saveApp();cloudMenu.classList.remove('on');renderLib();}});
   cloudMenu.appendChild(clr);
 }
+function authMsg(m){document.getElementById('authMsg').textContent=m||"";}
+async function doSignIn(){const email=document.getElementById('authEmail').value.trim();const pass=document.getElementById('authPass').value;
+  if(!email||!pass){authMsg("Введи почту и пароль.");return;}authMsg("Вхожу...");
+  try{const r=await sb.auth.signInWithPassword({email,password:pass});if(r.error){authMsg("Не получилось войти: "+r.error.message);return;}onLoggedIn(r.data.user);}catch(e){authMsg("Ошибка связи, попробуй ещё раз.");}}
+async function doSignUp(){const email=document.getElementById('authEmail').value.trim();const pass=document.getElementById('authPass').value;
+  if(!email||pass.length<6){authMsg("Нужна почта и пароль не короче 6 символов.");return;}authMsg("Создаю аккаунт...");
+  try{const r=await sb.auth.signUp({email,password:pass});if(r.error){authMsg("Не получилось: "+r.error.message);return;}
+    if(r.data.session){onLoggedIn(r.data.user);}else{authMsg("Аккаунт создан. Проверь почту, подтверди адрес и потом войди.");}}catch(e){authMsg("Ошибка связи, попробуй ещё раз.");}}
+async function doSignOut(){try{if(sb)await sb.auth.signOut();}catch(e){}userId=null;userEmail=null;APP={lang:null,data:{en:{videos:[]},es:{videos:[]},de:{videos:[]}}};try{localStorage.removeItem(APP_KEY);}catch(e){}cloudMenu.classList.remove('on');const p=document.getElementById('authPass');if(p)p.value="";show('screenAuth');}
+async function onLoggedIn(user){userId=user.id;userEmail=user.email;updateProfileCircle();authMsg("");
+  let d=null;try{d=await cloudLoad(userId);}catch(e){}
+  APP=d?d:{lang:null,data:{en:{videos:[]},es:{videos:[]},de:{videos:[]}}};saveApp();
+  if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else{renderHome();show('screenHome');}}
+async function initAuth(){
+  if(!sb){renderHome();if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else show('screenHome');return;}
+  try{const r=await sb.auth.getSession();if(r.data&&r.data.session){onLoggedIn(r.data.session.user);return;}}catch(e){}
+  show('screenAuth');}
+document.getElementById('signInBtn').addEventListener('click',doSignIn);
+document.getElementById('signUpBtn').addEventListener('click',doSignUp);
+document.getElementById('authPass').addEventListener('keydown',(e)=>{if(e.key==='Enter')doSignIn();});
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
   document.getElementById('backBtn').style.display=id==='screenPlayer'?'inline-block':'none';
-  document.getElementById('langCircle').style.display=APP.lang&&id!=='screenHome'?'flex':'none';
-  document.getElementById('cloudCircle').style.display=APP.lang&&id!=='screenHome'?'flex':'none';
+  document.getElementById('langCircle').style.display=(APP.lang&&id!=='screenHome'&&id!=='screenAuth')?'flex':'none';
+  document.getElementById('cloudCircle').style.display=((userId||!sb)&&id!=='screenAuth')?'flex':'none';
   window.scrollTo(0,0);
 }
 document.getElementById('homeLogo').addEventListener('click',()=>{if(recognizing)stopRepeat();show('screenHome');});
@@ -404,7 +542,7 @@ function renderLeveled(body,items){
   if(levelFilter!=="all")items=items.filter(v=>(v.level||"")===levelFilter);
   if(!items.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Здесь пока пусто. Поменяй уровень или добавь ролик.";body.appendChild(e);return;}
   const order=LEVELS.concat(["Без уровня"]);const groups={};items.forEach(it=>{const lv=it.level||"Без уровня";(groups[lv]=groups[lv]||[]).push(it);});
-  order.forEach(lv=>{if(!groups[lv])return;const g=document.createElement('div');g.className="lvl-group";const h=document.createElement('div');h.className="lvl-name";h.textContent=lv;g.appendChild(h);const grid=document.createElement('div');grid.className="vid-grid";groups[lv].forEach(it=>grid.appendChild(makeCard(it)));g.appendChild(grid);body.appendChild(g);});
+  const isAll=(levelFilter==="all");order.forEach(lv=>{if(!groups[lv])return;const g=document.createElement('div');g.className="lvl-group";const h=document.createElement('div');h.className="lvl-name";h.textContent=lv;g.appendChild(h);const grid=document.createElement('div');grid.className="vid-grid"+(isAll?" row":"");groups[lv].forEach(it=>grid.appendChild(makeCard(it)));g.appendChild(isAll?wrapCarousel(grid):grid);body.appendChild(g);});
 }
 function renderMedia(body){const list=MEDIA[APP.lang]||[];if(!list.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Медиатека пуста. Добавь свои ролики кнопкой «➕ ролик».";body.appendChild(e);return;}const grid=document.createElement('div');grid.className="vid-grid";list.forEach(it=>grid.appendChild(makeMediaCard(it)));body.appendChild(grid);}
 function renderLib(){
@@ -531,9 +669,7 @@ function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.cl
   const mn=Math.min(...valid),mx=Math.max(...valid),rng=Math.max(15,mx-mn);const xy=[];pts.forEach((v,i)=>{if(v)xy.push({x:(i/(pts.length-1))*(w-24)+12,y:h-18-((v-mn)/rng)*(h-36),i});});
   ctx2.strokeStyle="#6e1d2a";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
 
-loadApp();buildLangMenu();renderHome();
-if(APP.lang){setLangCircle(LANGS[APP.lang].flag);renderLib();show('screenLib');}else show('screenHome');
-if(sb)setTimeout(cloudSave,1200);
+loadApp();buildLangMenu();renderHome();initAuth();
 </script>
 </body>
 </html>
