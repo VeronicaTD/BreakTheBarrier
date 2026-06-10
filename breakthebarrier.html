@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BreakTheBarrier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fffbf0; --card:#fffefb; --ink:#43232f; --muted:#9a8590;
+    --line:#efe1dc; --accent:#cf7e9b; --accent-ink:#9c4f6a; --accent-soft:#f6e3ea;
+    --sage:#9aaa6f; --ok:#7d9a52; --miss:#c2b0b8; --stop:#c85f7a; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(55% 45% at 10% 6%, rgba(207,126,155,.20), transparent 62%),radial-gradient(55% 50% at 94% 98%, rgba(154,170,111,.18), transparent 62%)}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;background-image:radial-gradient(rgba(67,35,47,.05) 0.5px,transparent 0.7px);background-size:3px 3px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 50px}
+  .topbar{display:flex;align-items:center;gap:12px;padding:16px 0;position:sticky;top:0;background:var(--paper);z-index:20}
+  .brand{cursor:pointer;font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:600;color:var(--accent);letter-spacing:.01em}
+  .home-hero .h1,h2,.home-title{font-family:"Fraunces",Georgia,serif}
+  .topbar .spacer{flex:1}
+  .back{background:transparent;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit;font-size:14px}
+  .lang-circle{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .lang-wrap{position:relative}
+  .lang-menu{position:absolute;right:0;top:48px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;display:none;box-shadow:0 8px 24px rgba(60,30,20,.12);min-width:180px}
+  .lang-menu.on{display:block}
+  .lang-menu button{display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:none;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:15px;font-family:inherit;color:var(--ink)}
+  .lang-menu button:hover{background:var(--paper)}
+  button{font-family:inherit}
+  .btn-main{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 15px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-sec{background:var(--accent-soft);color:var(--accent-ink);border:none;border-radius:10px;padding:11px 15px;font-size:15px;font-weight:600;cursor:pointer}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:11px 15px;font-size:15px;font-weight:600;cursor:pointer}
+  input[type=text],textarea,select{font-family:inherit;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  input[type=text],textarea{width:100%;padding:11px 13px;font-size:15px}
+  textarea{min-height:120px;resize:vertical;font-size:14px;line-height:1.45}
+  input:focus,button:focus-visible,textarea:focus,select:focus{outline:3px solid var(--accent-soft);outline-offset:1px;border-color:var(--accent)}
+  .screen{display:none}
+  .screen.on{display:block}
+  .home-hero{margin:14px 0 8px}
+  .home-hero .h1{font-size:26px;font-weight:800;line-height:1.2}
+  .home-hero .h1 .br{color:var(--accent)}
+  .home-sub{color:var(--muted);margin:6px 0 22px}
+  .lang-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+  .lang-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 18px;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s}
+  .lang-card:hover{transform:translateY(-2px);border-color:var(--accent-soft)}
+  .lang-card .fl{font-size:46px}
+  .lang-card .nm{font-weight:700;margin-top:8px;font-size:17px}
+  .lib-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 14px}
+  .lib-head h2{font-size:21px;margin:0;flex:1}
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
+  .tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .subtabs{display:flex;gap:8px;margin-bottom:14px}
+  .subtab{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600;font-size:13.5px;cursor:pointer;color:var(--muted)}
+  .subtab.on{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent-soft)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:16px;-webkit-overflow-scrolling:touch}
+  .chip{flex:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .lvl-group{margin-bottom:24px}
+  .lvl-name{font-size:13px;font-weight:700;letter-spacing:.05em;color:var(--accent);margin-bottom:10px}
+  .vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+  .vid-card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;transition:transform .12s,border-color .12s}
+  .vid-card:hover{transform:translateY(-2px);border-color:var(--accent-soft)}
+  .thumb{width:100%;aspect-ratio:16/9;background:#3a2630 center/cover no-repeat;position:relative}
+  .ph-thumb{display:flex;align-items:center;justify-content:center;color:#f0e0d6;font-size:30px}
+  .badge{position:absolute;left:8px;top:8px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;letter-spacing:.03em}
+  .star{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.45);border:none;color:#fff;font-size:16px;width:30px;height:30px;border-radius:50%;cursor:pointer;line-height:1}
+  .vid-body{padding:11px 12px}
+  .vid-body .ttl{font-weight:700;font-size:13.5px;line-height:1.3}
+  .vid-body .meta{font-size:12px;color:var(--muted);margin-top:5px;display:flex;justify-content:space-between;align-items:center}
+  .vid-body .desc{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .vid-body .rm{font-size:12px;color:var(--miss);background:transparent;border:none;cursor:pointer;padding:0}
+  .lib-empty{color:var(--muted);padding:24px 4px;font-size:15px}
+  .form-row{margin-bottom:14px}
+  .form-row label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  .main{display:flex;gap:18px;align-items:flex-start}
+  .video-pane{flex:0 0 52%;position:sticky;top:74px}
+  .player-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#3a2630;border:1px solid var(--line)}
+  #playerWrap{position:absolute;inset:0}
+  #player{width:100%;height:100%}
+  .player-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#d8c4b0;font-size:14px;padding:20px}
+  .player-ph.hide{display:none}
+  .video-hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .edit-toggle{font-size:13px;color:var(--accent);background:transparent;border:none;cursor:pointer;margin-top:8px;padding:0;font-weight:600}
+  .edit-box{display:none;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .edit-box.on{display:block}
+  .embedwarn,.srwarn{background:var(--accent-soft);border:1px solid #ddbdb8;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--accent-ink);margin-top:10px;display:none}
+  .embedwarn.on,.srwarn.on{display:block}
+  .script-pane{flex:1;min-width:0}
+  .script-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+  .script-bar .count{font-size:13px;color:var(--muted)}
+  .script-bar label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  select{padding:6px 8px;font-size:14px}
+  .script-empty{font-size:14px;color:var(--muted);padding:20px 6px}
+  .line{padding:9px 12px;border-radius:9px;font-size:16px;line-height:1.5;cursor:pointer;border:1px solid transparent;transition:background .12s}
+  .line:hover{background:#fff}
+  .line.active{background:#fff;border-color:var(--accent-soft)}
+  .line .w.ok{color:var(--ok);font-weight:700}
+  .line .w.miss{color:var(--miss)}
+  .line.empty{color:var(--miss);font-style:italic}
+  .ctrl{display:none;background:#fff;border:1px solid var(--accent-soft);border-radius:12px;padding:14px;margin:6px 0 12px}
+  .ctrl.on{display:block}
+  .ctrl-head{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+  .ctrl-btns{display:flex;gap:10px}
+  .ctrl-btns button{flex:1}
+  #repeatBtn.recording{background:var(--stop);color:#fff}
+  .status{font-size:13px;color:var(--accent);min-height:16px;margin-top:9px;font-weight:600}
+  .result{display:none;margin-top:10px}
+  .result.on{display:block}
+  .score{font-size:14.5px;font-weight:700;margin-bottom:6px}
+  .said{font-size:13.5px;color:var(--muted);background:var(--paper);border-radius:9px;padding:9px 11px}
+  .said b{color:var(--ink)}
+  .tempo{font-size:13.5px;margin-top:10px;background:var(--paper);border-radius:9px;padding:9px 11px}
+  .tempo b{color:var(--ink)}
+  .pitch-title{font-size:12px;color:var(--muted);margin:12px 0 5px}
+  canvas{width:100%;height:70px;background:var(--paper);border-radius:9px;display:block}
+  .ctrl-next{margin-top:12px;width:100%}
+  @media (max-width:760px){
+    .main{flex-direction:column}
+    .video-pane{position:sticky;top:64px;width:100%;flex:none;z-index:5;background:var(--paper);padding:6px 0 8px}
+    .script-pane{width:100%}
+    .line{font-size:17px}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <button class="back" id="backBtn" style="display:none">← к роликам</button>
+    <span class="brand" id="homeLogo">BreakTheBarrier</span>
+    <span class="spacer"></span>
+    <div class="lang-wrap"><button class="lang-circle" id="cloudCircle" style="display:none">☁</button><div class="lang-menu" id="cloudMenu" style="min-width:250px;padding:14px"></div></div>
+    <div class="lang-wrap"><button class="lang-circle" id="langCircle" style="display:none">🌐</button><div class="lang-menu" id="langMenu"></div></div>
+  </div>
+
+  <div class="screen" id="screenHome">
+    <div class="home-hero">
+      <div class="h1">Ломаем языковой <span class="br">барьер</span></div>
+    </div>
+    <div class="home-sub">Выбери язык. Повторяй за носителями и готовься к разговору на экзамене.</div>
+    <div class="lang-cards" id="langCards"></div>
+  </div>
+
+  <div class="screen" id="screenLib">
+    <div class="lib-head">
+      <h2 id="libTitle"></h2>
+      <button class="btn-ghost" id="favBtn">☆ избранное</button>
+      <button class="btn-main" id="addBtn">➕ ролик</button>
+    </div>
+    <div class="tabs" id="sectionTabs"></div>
+    <div class="subtabs" id="subtabs"></div>
+    <div class="chips" id="chips"></div>
+    <div id="libBody"></div>
+  </div>
+
+  <div class="screen" id="screenAdd">
+    <h2 style="margin:8px 0 18px">Новый ролик</h2>
+    <div class="form-row"><label>Название</label><input type="text" id="addTitle" placeholder="например, TED про привычки"></div>
+    <div class="form-row"><label>Уровень</label>
+      <select id="addLevel" style="width:100%;padding:11px 13px"><option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option><option>C2</option></select></div>
+    <div class="form-row"><label>Ссылка с YouTube</label><input type="text" id="addUrl" placeholder="https://www.youtube.com/watch?v=..."></div>
+    <div class="form-row"><label>Скрипт с таймкодами (можно добавить позже)</label>
+      <textarea id="addScript" placeholder="0:00  Hello and welcome
+0:04  Today we are going to..."></textarea></div>
+    <div style="display:flex;gap:10px"><button class="btn-ghost" id="addCancel" style="flex:1">Отмена</button><button class="btn-main" id="addSave" style="flex:1">Сохранить</button></div>
+  </div>
+
+  <div class="screen" id="screenPlayer">
+    <div class="main">
+      <div class="video-pane">
+        <div class="player-box"><div id="playerWrap"><div id="player"></div></div><div class="player-ph" id="playerPh">Загрузи ссылку через «изменить ролик» ниже</div></div>
+        <div class="video-hint" id="videoHint">Нажми фразу справа, потом «Прослушать» или «Повторить».</div>
+        <button class="btn-sec" id="toTrainerBtn" style="display:none;width:100%;margin-top:10px">➕ сделать тренажёром из этого ролика</button>
+        <button class="edit-toggle" id="editToggle">⚙ изменить ссылку и скрипт</button>
+        <div class="edit-box" id="editBox">
+          <label style="font-size:13px;color:var(--muted);font-weight:600">Ссылка</label>
+          <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." style="margin:5px 0 8px">
+          <button class="btn-sec" id="loadBtn" style="width:100%">Загрузить ролик</button>
+          <div class="embedwarn" id="embedWarn">Этот ролик нельзя встроить. Возьми другой.</div>
+          <label style="font-size:13px;color:var(--muted);font-weight:600;display:block;margin-top:12px">Скрипт</label>
+          <textarea id="scriptInput" placeholder="0:00 ..." style="margin:5px 0 8px"></textarea>
+          <button class="btn-sec" id="parseBtn" style="width:100%">Разобрать на фразы</button>
+          <button class="btn-ghost" id="markBtn" style="width:100%;margin-top:8px">➕ Отметить фразу с этого места</button>
+        </div>
+      </div>
+      <div class="script-pane">
+        <div class="script-bar"><span class="count" id="count"></span>
+          <label>за раз:<select id="segSel"><option value="1">1 фраза</option><option value="2">2 фразы</option><option value="3">3 фразы</option><option value="4">4 фразы</option></select></label>
+        </div>
+        <div id="scriptList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ctrl" id="ctrl">
+  <div class="ctrl-head" id="ctrlHead"></div>
+  <div class="ctrl-btns"><button class="btn-sec" id="listenBtn">🔊 Прослушать</button><button class="btn-main" id="repeatBtn">🎤 Повторить</button></div>
+  <div class="status" id="status"></div>
+  <div class="result" id="result"><div class="score" id="score"></div><div class="said" id="said"></div></div>
+  <div class="tempo" id="tempo" style="display:none"></div>
+  <div class="pitch-title">🎵 Мелодия твоего голоса (грубо, без сравнения с диктором)</div>
+  <canvas id="pitchCanvas"></canvas>
+  <button class="btn-ghost ctrl-next" id="nextBtn">следующая фраза →</button>
+  <div class="srwarn" id="srWarn">На этом устройстве браузер не распознаёт речь, оценку слов не покажу. Темп и интонация работают. Лучше открыть на компьютере в Chrome.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const LANGS={en:{flag:"🇬🇧",name:"Английский",rec:"en-US"},es:{flag:"🇪🇸",name:"Испанский",rec:"es-ES"},de:{flag:"🇩🇪",name:"Немецкий",rec:"de-DE"}};
+const LEVELS=["A1","A2","B1","B2","C1","C2"];
+
+/* SHADOWING: учебные ролики по уровням (реальные, язык проверен) */
+const SUGGESTED={
+  en:[],
+  es:[],
+  de:[
+    {title:"Lederhose 2.0",videoId:"WIHcCjrjm_U",level:"B2",desc:"О немецкой культуре, традициях и современном взгляде на привычные символы. Про идентичность, юмор и стереотипы."},
+    {title:"Hör! Mir! Zu! Warum wir gute Kommunikation lieben",videoId:"VNZPM1qvce0",level:"B2",desc:"Почему людям важно быть услышанными. Немецкий на тему общения, внимания и человеческого контакта."},
+    {title:"80 für 80: 80% weniger Stress in 80 Sekunden?",videoId:"BrJaBArQX1M",level:"B2",desc:"О стрессе и простых способах быстро вернуть спокойствие. Практичная тема, хорошее первое TEDx."},
+    {title:"Wie ich lernte, meine Angst zu akzeptieren",videoId:"G0F10leavbI",level:"B2",desc:"Личная история о страхе и принятии себя. Живой рассказ с эмоциональным опытом."},
+    {title:"Anleitung zum Nichts-Tun",videoId:"WhcvAXG-lcU",level:"B2",desc:"О паузах, отдыхе и умении ничего не делать без чувства вины. Про замедление и осознанность."},
+    {title:"The Maybe Era: Non-committal in everyday life",videoId:"F8RJNMA9UFs",level:"B2",desc:"О привычке откладывать решения и жить в режиме «может быть». Близко к повседневной жизни."},
+    {title:"Refugees in Germany — Breaking the Ice With Comedy",videoId:"xWd_L8jqozY",level:"B2",desc:"О беженцах в Германии через юмор и живое общение. Социальная тема без академичной подачи."},
+    {title:"Performance / Kasperltheater",videoId:"QCB2p8UYGRc",level:"B2",desc:"Нестандартное сценическое видео. Смотреть ради атмосферы, жестов, интонации и необычной подачи."},
+    {title:"How to become your own superhero",videoId:"D7hB4ZR2Tuo",level:"B2",desc:"Мотивационное выступление о внутренней силе и личной ответственности. Простая вдохновляющая идея."},
+    {title:"Leben ohne Skript",videoId:"FA-qTVj3o7E",level:"B2",desc:"О жизни без готового сценария, импровизации и неожиданных поворотах. Про свободу и спонтанность."},
+    {title:"Ich esse Fleisch!",videoId:"Q8U87TcxHP0",level:"B2",desc:"О еде, привычках и личном выборе. Понятная тема с поводом задуматься о своих решениях."},
+    {title:"The Path to a Fulfilling Life",videoId:"S65yOVjxZ4Q",level:"B2",desc:"О том, что делает жизнь наполненной. Про цели, смысл, личное развитие и спокойные размышления."}
+  ]
+};
+
+/* МЕДИАТЕКА: живой контент */
+const MEDIA={en:[],es:[],de:[]};
+
+/* SMALL TALK: международные экзамены (реальные образцы устной части) */
+const SMALLTALK={en:[],es:[],de:[]};
+
+let APP={lang:null,data:{en:{videos:[]},es:{videos:[]},de:{videos:[]}}};
+let curVideo=null;
+const APP_KEY="echo_app_v1";
+function saveApp(){try{localStorage.setItem(APP_KEY,JSON.stringify(APP));}catch(e){}scheduleCloud();}
+function loadApp(){try{const s=localStorage.getItem(APP_KEY);if(s){APP=JSON.parse(s);}else migrate();}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function migrate(){try{const s=localStorage.getItem("echo_data_v2");if(s){const old=JSON.parse(s);if(old&&old.phrases&&old.phrases.length){APP.data.en.videos.push({vid:uid(),title:"Мой первый ролик",topic:"",level:"B1",fav:false,url:old.url||"",videoId:old.videoId||"",phrases:old.phrases});saveApp();}}}catch(e){}}
+function parseVideoId(url){if(!url)return"";const m=url.match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);return m?m[1]:(url.length===11?url:"");}
+function phrases(){return curVideo?curVideo.phrases:[];}
+function thumb(id){return id?"https://img.youtube.com/vi/"+id+"/hqdefault.jpg":"";}
+
+/* ===== ОБЛАКО (Supabase): резервная копия библиотеки ===== */
+const SB_URL="https://fnmxgojqdenmtobzlnhi.supabase.co";
+const SB_KEY="sb_publishable_zDh9jivsCq5k3ErIXSeHlg_SWTsZ8Ar";
+let sb=null;try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY);}catch(e){}
+let userId=localStorage.getItem('btb_uid');if(!userId){userId=uid()+uid();localStorage.setItem('btb_uid',userId);}
+let cloudTimer=null;
+function scheduleCloud(){if(!sb)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudSave,1500);}
+async function cloudSave(){if(!sb)return;try{await sb.from('app_state').upsert({id:userId,data:APP});}catch(e){}}
+async function cloudLoad(id){if(!sb)return null;try{const r=await sb.from('app_state').select('data').eq('id',id).maybeSingle();return r&&r.data?r.data.data:null;}catch(e){return null;}}
+const cloudMenu=document.getElementById('cloudMenu');
+document.getElementById('cloudCircle').addEventListener('click',(e)=>{e.stopPropagation();buildCloudMenu();cloudMenu.classList.toggle('on');});
+document.addEventListener('click',()=>cloudMenu.classList.remove('on'));
+function buildCloudMenu(){
+  cloudMenu.innerHTML="";
+  const t=document.createElement('div');t.style.cssText="font-size:13px;color:var(--muted);margin-bottom:8px";
+  t.textContent=sb?"Твой код. Сохрани его, чтобы открыть свою библиотеку на другом устройстве или восстановить.":"Облако недоступно. Открой сайт на Netlify.";
+  cloudMenu.appendChild(t);
+  if(!sb)return;
+  const code=document.createElement('div');code.style.cssText="font-weight:700;word-break:break-all;background:var(--paper);border-radius:8px;padding:8px;font-size:13px;margin-bottom:8px";code.textContent=userId;cloudMenu.appendChild(code);
+  const copy=document.createElement('button');copy.className="btn-sec";copy.style.width="100%";copy.textContent="Копировать код";
+  copy.addEventListener('click',(e)=>{e.stopPropagation();try{navigator.clipboard.writeText(userId);}catch(_){}copy.textContent="Скопировано";});cloudMenu.appendChild(copy);
+  const inp=document.createElement('input');inp.type="text";inp.placeholder="вставь код с другого устройства";inp.style.cssText="width:100%;margin-top:12px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px";inp.addEventListener('click',e=>e.stopPropagation());cloudMenu.appendChild(inp);
+  const load=document.createElement('button');load.className="btn-ghost";load.style.cssText="width:100%;margin-top:8px";load.textContent="Открыть по коду";
+  load.addEventListener('click',async(e)=>{e.stopPropagation();const id=inp.value.trim();if(!id)return;load.textContent="Загружаю...";const d=await cloudLoad(id);
+    if(d){APP=d;userId=id;localStorage.setItem('btb_uid',id);saveApp();cloudMenu.classList.remove('on');
+      if(APP.lang){document.getElementById('langCircle').textContent=LANGS[APP.lang].flag;renderLib();show('screenLib');}else{renderHome();show('screenHome');}}
+    else load.textContent="Не найдено. На первом устройстве открой ☁ ещё раз и убедись, что код тот же";});
+  cloudMenu.appendChild(load);
+  const clr=document.createElement('button');clr.className="btn-ghost";clr.style.cssText="width:100%;margin-top:12px;color:var(--stop);border-color:var(--stop)";clr.textContent="Очистить мои ролики";
+  clr.addEventListener('click',(e)=>{e.stopPropagation();if(confirm("Удалить все ролики, которые ты добавляла или открывала? Встроенные рекомендации останутся.")){APP.data={en:{videos:[]},es:{videos:[]},de:{videos:[]}};saveApp();cloudMenu.classList.remove('on');renderLib();}});
+  cloudMenu.appendChild(clr);
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.getElementById('backBtn').style.display=id==='screenPlayer'?'inline-block':'none';
+  document.getElementById('langCircle').style.display=APP.lang&&id!=='screenHome'?'flex':'none';
+  document.getElementById('cloudCircle').style.display=APP.lang&&id!=='screenHome'?'flex':'none';
+  window.scrollTo(0,0);
+}
+document.getElementById('homeLogo').addEventListener('click',()=>{if(recognizing)stopRepeat();show('screenHome');});
+document.getElementById('backBtn').addEventListener('click',()=>{if(recognizing)stopRepeat();if(player)player.pauseVideo();renderLib();show('screenLib');});
+const langMenu=document.getElementById('langMenu');
+document.getElementById('langCircle').addEventListener('click',(e)=>{e.stopPropagation();langMenu.classList.toggle('on');});
+document.addEventListener('click',()=>langMenu.classList.remove('on'));
+function buildLangMenu(){langMenu.innerHTML="";Object.keys(LANGS).forEach(code=>{const b=document.createElement('button');b.innerHTML="<span style='font-size:20px'>"+LANGS[code].flag+"</span> "+LANGS[code].name;b.addEventListener('click',(e)=>{e.stopPropagation();langMenu.classList.remove('on');pickLang(code);});langMenu.appendChild(b);});}
+
+function renderHome(){const box=document.getElementById('langCards');box.innerHTML="";Object.keys(LANGS).forEach(code=>{const c=document.createElement('div');c.className="lang-card";c.innerHTML="<div class='fl'>"+LANGS[code].flag+"</div><div class='nm'>"+LANGS[code].name+"</div>";c.addEventListener('click',()=>pickLang(code));box.appendChild(c);});}
+function pickLang(code){APP.lang=code;saveApp();document.getElementById('langCircle').textContent=LANGS[code].flag;section="shadowing";libTab="levels";levelFilter="all";renderLib();show('screenLib');}
+
+/* БИБЛИОТЕКА */
+let section="shadowing",libTab="levels",favFilter=false,levelFilter="all";
+document.getElementById('favBtn').addEventListener('click',()=>{favFilter=!favFilter;document.getElementById('favBtn').textContent=favFilter?"★ избранное":"☆ избранное";renderLib();});
+document.getElementById('addBtn').addEventListener('click',()=>{document.getElementById('addTitle').value="";document.getElementById('addUrl').value="";document.getElementById('addScript').value="";document.getElementById('addLevel').value="B1";show('screenAdd');});
+
+function renderSectionTabs(){const t=document.getElementById('sectionTabs');t.innerHTML="";
+  [["shadowing","Shadowing"],["smalltalk","Small talk"]].forEach(([id,name])=>{const b=document.createElement('button');b.className="tab"+(section===id?" on":"");b.textContent=name;b.addEventListener('click',()=>{section=id;levelFilter="all";renderLib();});t.appendChild(b);});}
+function renderSubtabs(){const t=document.getElementById('subtabs');t.innerHTML="";
+  if(section!=="shadowing"){t.style.display="none";return;}t.style.display="flex";
+  [["levels","По уровням"],["media","Медиатека"]].forEach(([id,name])=>{const b=document.createElement('button');b.className="subtab"+(libTab===id?" on":"");b.textContent=name;b.addEventListener('click',()=>{libTab=id;renderLib();});t.appendChild(b);});}
+function renderChips(){const c=document.getElementById('chips');c.innerHTML="";["all"].concat(LEVELS).forEach(lv=>{const b=document.createElement('button');b.className="chip"+(levelFilter===lv?" on":"");b.textContent=lv==="all"?"Все":lv;b.addEventListener('click',()=>{levelFilter=lv;renderLib();});c.appendChild(b);});}
+
+function makeCard(item){
+  const card=document.createElement('div');card.className="vid-card";
+  const cover=item.videoId||item.coverId||"";
+  const thumbInner=cover?("<div class='thumb' style=\"background-image:url("+thumb(cover)+")\">"):("<div class='thumb ph-thumb'>\u25B6");
+  card.innerHTML=thumbInner+"<span class='badge'>"+(item.level||"")+"</span></div><div class='vid-body'><div class='ttl'>"+item.title+"</div>"+(item.desc?("<div class='desc'>"+item.desc+"</div>"):"")+"</div>";
+  if(item.desc)card.title=item.desc;
+  const body=card.querySelector('.vid-body');const meta=document.createElement('div');meta.className="meta";
+  if(item.kind==='mine'){
+    meta.innerHTML="<span>"+item.phrases.length+" фраз</span>";
+    const rm=document.createElement('button');rm.className="rm";rm.textContent="удалить";
+    rm.addEventListener('click',(e)=>{e.stopPropagation();if(confirm("Удалить ролик «"+item.title+"»?")){APP.data[APP.lang].videos=APP.data[APP.lang].videos.filter(x=>x.vid!==item.vid);saveApp();renderLib();}});
+    meta.appendChild(rm);
+    const star=document.createElement('button');star.className="star";star.textContent=item.fav?"★":"☆";
+    star.addEventListener('click',(e)=>{e.stopPropagation();item.fav=!item.fav;saveApp();renderLib();});
+    card.querySelector('.thumb').appendChild(star);
+    card.addEventListener('click',()=>openVideo(item));
+  }else if(item.playlistId){meta.innerHTML="<span>"+(item.note||"подборка")+"</span>";card.addEventListener('click',()=>openMedia(item));}
+  else{meta.innerHTML="<span>"+(item.note||"рекомендовано")+"</span>";card.addEventListener('click',()=>openSuggested(item));}
+  body.appendChild(meta);return card;
+}
+function makeMediaCard(item){
+  const card=document.createElement('div');card.className="vid-card";
+  if(item.videoId)card.innerHTML="<div class='thumb' style='background-image:url("+thumb(item.videoId)+")'><span class='badge'>"+item.tag+"</span></div><div class='vid-body'><div class='ttl'>"+item.title+"</div></div>";
+  else card.innerHTML="<div class='thumb ph-thumb'>▶<span class='badge'>"+item.tag+"</span></div><div class='vid-body'><div class='ttl'>"+item.title+"</div><div class='meta'>подборка, листай в плеере</div></div>";
+  card.addEventListener('click',()=>openMedia(item));return card;
+}
+function wrapCarousel(grid){
+  const wrap=document.createElement('div');wrap.className="carousel";
+  const left=document.createElement('button');left.className="arrow left";left.textContent="\u2039";
+  const right=document.createElement('button');right.className="arrow right";right.textContent="\u203A";
+  left.addEventListener('click',()=>grid.scrollBy({left:-grid.clientWidth*0.85,behavior:'smooth'}));
+  right.addEventListener('click',()=>grid.scrollBy({left:grid.clientWidth*0.85,behavior:'smooth'}));
+  wrap.appendChild(grid);wrap.appendChild(left);wrap.appendChild(right);return wrap;
+}
+function renderLeveled(body,items){
+  if(levelFilter!=="all")items=items.filter(v=>(v.level||"")===levelFilter);
+  if(!items.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Здесь пока пусто. Поменяй уровень или добавь ролик.";body.appendChild(e);return;}
+  const order=LEVELS.concat(["Без уровня"]);const groups={};items.forEach(it=>{const lv=it.level||"Без уровня";(groups[lv]=groups[lv]||[]).push(it);});
+  order.forEach(lv=>{if(!groups[lv])return;const g=document.createElement('div');g.className="lvl-group";const h=document.createElement('div');h.className="lvl-name";h.textContent=lv;g.appendChild(h);const grid=document.createElement('div');grid.className="vid-grid";groups[lv].forEach(it=>grid.appendChild(makeCard(it)));g.appendChild(grid);body.appendChild(g);});
+}
+function renderMedia(body){const list=MEDIA[APP.lang]||[];if(!list.length){const e=document.createElement('div');e.className="lib-empty";e.textContent="Медиатека пуста. Добавь свои ролики кнопкой «➕ ролик».";body.appendChild(e);return;}const grid=document.createElement('div');grid.className="vid-grid";list.forEach(it=>grid.appendChild(makeMediaCard(it)));body.appendChild(grid);}
+function renderLib(){
+  const lang=APP.lang;
+  document.getElementById('libTitle').textContent=LANGS[lang].name;
+  renderSectionTabs();renderSubtabs();
+  const chipsEl=document.getElementById('chips'),body=document.getElementById('libBody');body.innerHTML="";
+  const inShadowLevels=section==="shadowing"&&libTab==="levels";
+  document.getElementById('favBtn').style.display=inShadowLevels?'inline-block':'none';
+  document.getElementById('addBtn').style.display=section==="shadowing"?'inline-block':'none';
+  if(section==="shadowing"&&libTab==="media"){chipsEl.style.display='none';renderMedia(body);return;}
+  chipsEl.style.display='flex';renderChips();
+  if(section==="smalltalk"){
+    const items=(SMALLTALK[lang]||[]).map(s=>Object.assign({kind:'suggested',note:'экзамен'},s));
+    renderLeveled(body,items);return;
+  }
+  // shadowing levels
+  let items=APP.data[lang].videos.map(v=>Object.assign({kind:'mine'},v));
+  if(favFilter)items=items.filter(v=>v.fav);
+  if(!favFilter){const mineIds=new Set(APP.data[lang].videos.map(v=>v.videoId));(SUGGESTED[lang]||[]).forEach(s=>{if(!mineIds.has(s.videoId))items.push(Object.assign({kind:'suggested'},s));});}
+  renderLeveled(body,items);
+}
+
+document.getElementById('addCancel').addEventListener('click',()=>{renderLib();show('screenLib');});
+document.getElementById('addSave').addEventListener('click',()=>{
+  const title=document.getElementById('addTitle').value.trim()||"Без названия";const level=document.getElementById('addLevel').value;const url=document.getElementById('addUrl').value.trim();
+  const v={vid:uid(),title,topic:"",level,fav:false,url,videoId:parseVideoId(url),phrases:parseScript(document.getElementById('addScript').value)};
+  APP.data[APP.lang].videos.push(v);saveApp();openVideo(v);});
+
+function openVideo(v){
+  curVideo=v;activeIndex=-1;ctrl.classList.remove('on');playlistMode=false;updatePlayerUI();
+  document.getElementById('editBox').classList.remove('on');document.getElementById('urlInput').value=v.url||"";
+  show('screenPlayer');
+  if(v.videoId){buildPlayer(v.videoId);}else document.getElementById('playerPh').classList.remove('hide');
+  renderScript();
+}
+function openSuggested(s){
+  const ex=APP.data[APP.lang].videos.find(v=>v.videoId===s.videoId);
+  if(ex){openVideo(ex);return;}
+  openVideo({vid:uid(),title:s.title,topic:"",level:s.level||"",fav:false,url:"https://youtu.be/"+s.videoId,videoId:s.videoId,phrases:[],transient:true});
+}
+function persistCur(){if(curVideo&&curVideo.transient){delete curVideo.transient;APP.data[APP.lang].videos.push(curVideo);}}
+
+/* YOUTUBE (видео или подборка) */
+let player=null,ytReady=false,pending=null,playlistMode=false;
+const tag=document.createElement('script');tag.src="https://www.youtube.com/iframe_api";document.head.appendChild(tag);
+window.onYouTubeIframeAPIReady=function(){ytReady=true;if(pending){const p=pending;pending=null;p.t==='p'?buildPlaylist(p.id):buildPlayer(p.id);}};
+function ytErr(){return{onError:()=>document.getElementById('embedWarn').classList.add('on')};}
+function freshPlayerEl(){if(player){try{player.destroy();}catch(e){}player=null;}document.getElementById('playerWrap').innerHTML='<div id="player"></div>';}
+function buildPlayer(id){playlistMode=false;updatePlayerUI();document.getElementById('embedWarn').classList.remove('on');document.getElementById('playerPh').classList.add('hide');
+  if(!ytReady){pending={t:'v',id};return;}
+  freshPlayerEl();
+  player=new YT.Player('player',{videoId:id,playerVars:{rel:0,playsinline:1,modestbranding:1},events:ytErr()});}
+function buildPlaylist(pid){playlistMode=true;updatePlayerUI();document.getElementById('embedWarn').classList.remove('on');document.getElementById('playerPh').classList.add('hide');
+  if(!ytReady){pending={t:'p',id:pid};return;}
+  freshPlayerEl();
+  player=new YT.Player('player',{playerVars:{listType:'playlist',list:pid,rel:0,playsinline:1,modestbranding:1},events:ytErr()});}
+function updatePlayerUI(){document.getElementById('toTrainerBtn').style.display=playlistMode?'block':'none';
+  document.getElementById('videoHint').textContent=playlistMode?"Это подборка. Листай ролики в плеере и выбирай. Понравился, нажми кнопку ниже, чтобы тренироваться по фразам.":"Нажми фразу справа, потом «Прослушать» или «Повторить».";}
+function openMedia(item){if(item.playlistId){curVideo={title:item.title,topic:"",level:"",fav:false,url:"",videoId:"",phrases:[]};activeIndex=-1;ctrl.classList.remove('on');document.getElementById('editBox').classList.remove('on');show('screenPlayer');buildPlaylist(item.playlistId);renderScript();}else openSuggested(item);}
+document.getElementById('toTrainerBtn').addEventListener('click',()=>{const d=(player&&player.getVideoData)?player.getVideoData():null;const id=d&&d.video_id;
+  if(!id){alert("Сначала запусти ролик в плеере.");return;}
+  let ex=APP.data[APP.lang].videos.find(v=>v.videoId===id);
+  if(!ex){ex={vid:uid(),title:d.title||"Ролик из медиатеки",topic:"",level:"",fav:false,url:"https://youtu.be/"+id,videoId:id,phrases:[]};APP.data[APP.lang].videos.push(ex);saveApp();}
+  openVideo(ex);document.getElementById('editBox').classList.add('on');});
+document.getElementById('editToggle').addEventListener('click',()=>document.getElementById('editBox').classList.toggle('on'));
+document.getElementById('loadBtn').addEventListener('click',()=>{const url=document.getElementById('urlInput').value.trim();const id=parseVideoId(url);if(!id){alert("Не получилось прочитать ссылку.");return;}curVideo.url=url;curVideo.videoId=id;persistCur();saveApp();buildPlayer(id);});
+
+/* СКРИПТ */
+function tcToSec(tc){const p=tc.split(':').map(Number);if(p.length===2)return p[0]*60+p[1];if(p.length===3)return p[0]*3600+p[1]*60+p[2];return null;}
+function parseScript(raw){if(!raw)return[];const lines=raw.split(/\r?\n/);const re=/^\s*\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?[\s,.\-]*(.*)$/;const out=[];let curT=null,curText=[];const flush=()=>{if(curT!==null)out.push({t:curT,text:curText.join(' ').replace(/\s+/g,' ').trim()});curText=[];};
+  for(let ln of lines){if(!ln.trim())continue;if(ln.includes('-->'))continue;if(/^\s*\d+\s*$/.test(ln))continue;const m=ln.match(re);if(m){flush();curT=tcToSec(m[1]);if(m[2])curText.push(m[2]);}else curText.push(ln.trim());}flush();return out.filter(p=>p.t!==null);}
+document.getElementById('parseBtn').addEventListener('click',()=>{const parsed=parseScript(document.getElementById('scriptInput').value);if(!parsed.length){alert("Не нашла таймкоды. Нужно время в строках, например 0:12.");return;}curVideo.phrases=parsed;persistCur();saveApp();document.getElementById('scriptInput').value="";renderScript();alert("Готово, фраз получилось "+parsed.length+".");});
+document.getElementById('markBtn').addEventListener('click',()=>{if(!player||typeof player.getCurrentTime!=="function"){alert("Сначала загрузи ролик.");return;}curVideo.phrases.push({t:Math.max(0,player.getCurrentTime()-0.3),text:""});curVideo.phrases.sort((a,b)=>a.t-b.t);persistCur();saveApp();renderScript();});
+
+/* СПИСОК */
+let segSize=1,activeIndex=-1;
+const listEl=document.getElementById('scriptList');const ctrl=document.getElementById('ctrl');
+document.getElementById('segSel').addEventListener('change',e=>{segSize=+e.target.value;if(activeIndex>=0)activate(activeIndex);});
+function renderScript(){listEl.innerHTML="";activeIndex=-1;ctrl.classList.remove('on');document.getElementById('count').textContent=phrases().length?phrases().length+" фраз":"";
+  if(!phrases().length){const e=document.createElement('div');e.className="script-empty";e.textContent="Скрипта нет. Открой «⚙ изменить ссылку и скрипт» и вставь расшифровку.";listEl.appendChild(e);return;}
+  phrases().forEach((p,i)=>{const line=document.createElement('div');line.className="line";line.dataset.i=i;
+    if(p.text){p.text.split(/\s+/).forEach(w=>{const s=document.createElement('span');s.className="w";s.textContent=w+" ";line.appendChild(s);});}else{line.classList.add('empty');line.textContent="(нет текста, нажми чтобы вписать)";}
+    line.addEventListener('click',()=>{if(p.text===""){const t=prompt("Текст фразы:");if(t!==null){p.text=t;saveApp();renderScript();}return;}activate(i);});listEl.appendChild(line);});}
+function activeLines(){const a=[];for(let k=activeIndex;k<Math.min(activeIndex+segSize,phrases().length);k++)a.push(k);return a;}
+function segText(){return activeLines().map(k=>phrases()[k].text).join(' ').trim();}
+function activate(i){if(recognizing)stopRepeat();document.querySelectorAll('.line').forEach(l=>{l.classList.remove('active');l.querySelectorAll('.w').forEach(w=>w.classList.remove('ok','miss'));});
+  activeIndex=i;const lines=activeLines();lines.forEach(k=>listEl.children[k].classList.add('active'));listEl.children[lines[lines.length-1]].after(ctrl);ctrl.classList.add('on');
+  document.getElementById('ctrlHead').textContent="фраза "+(i+1)+" из "+phrases().length;document.getElementById('result').classList.remove('on');document.getElementById('tempo').style.display="none";document.getElementById('status').textContent="";clearCanvas();}
+document.getElementById('nextBtn').addEventListener('click',()=>{const ni=activeIndex+segSize;if(ni<phrases().length){activate(ni);ctrl.scrollIntoView({behavior:'smooth',block:'center'});}});
+
+let stopTimer=null,lastSpeakerDur=0;
+document.getElementById('listenBtn').addEventListener('click',()=>{if(!player||activeIndex<0)return;const start=phrases()[activeIndex].t;const after=phrases()[activeIndex+segSize];const end=after?after.t:start+6*segSize;lastSpeakerDur=Math.max(0.5,end-start);clearTimeout(stopTimer);player.seekTo(start,true);player.playVideo();stopTimer=setTimeout(()=>player.pauseVideo(),Math.max(800,(end-start)*1000));});
+
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR)document.getElementById('srWarn').classList.add('on');
+function normWords(s){return(s||"").toLowerCase().replace(/[.,!?;:"'`()\u2014\u2013-]/g," ").split(/\s+/).filter(Boolean);}
+function alignWords(target,said){const T=normWords(target),S=normWords(said),n=T.length,m=S.length;const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)dp[i][j]=T[i-1]===S[j-1]?dp[i-1][j-1]+1:Math.max(dp[i-1][j],dp[i][j-1]);
+  const hit=new Array(n).fill(false);let i=n,j=m;while(i>0&&j>0){if(T[i-1]===S[j-1]){hit[i-1]=true;i--;j--;}else if(dp[i-1][j]>=dp[i][j-1])i--;else j--;}return{hit,score:n?Math.round(hit.filter(Boolean).length/n*100):0};}
+let recognizing=false,recog=null,finalText="";
+document.getElementById('repeatBtn').addEventListener('click',()=>{if(!recognizing)startRepeat();else stopRepeat();});
+function startRepeat(){if(activeIndex<0)return;recognizing=true;finalText="";const b=document.getElementById('repeatBtn');b.textContent="⏹ Стоп";b.classList.add('recording');document.getElementById('result').classList.remove('on');document.getElementById('status').textContent="🎤 Слушаю, говори, потом жми Стоп";startPitch();if(!SR)return;
+  recog=new SR();recog.lang=LANGS[APP.lang].rec;recog.continuous=true;recog.interimResults=false;recog.maxAlternatives=1;
+  recog.onresult=(e)=>{for(let k=e.resultIndex;k<e.results.length;k++)if(e.results[k].isFinal)finalText+=e.results[k][0].transcript+" ";};
+  recog.onerror=(e)=>{if(e.error==="no-speech")document.getElementById('status').textContent="Не расслышала, ещё раз";};
+  recog.onend=()=>{if(recognizing)stopRepeat();else showResult(finalText);};try{recog.start();}catch(e){}}
+function stopRepeat(){recognizing=false;const b=document.getElementById('repeatBtn');b.textContent="🎤 Повторить";b.classList.remove('recording');stopPitch();if(recog){try{recog.stop();}catch(e){}setTimeout(()=>showResult(finalText),150);}else showResult("");}
+function showResult(said){document.getElementById('status').textContent="";if(SR){const{hit,score}=alignWords(segText(),said);const spans=[];activeLines().forEach(k=>listEl.children[k].querySelectorAll('.w').forEach(w=>spans.push(w)));spans.forEach((s,i)=>s.classList.add(hit[i]?"ok":"miss"));document.getElementById('result').classList.add('on');const v=score>=85?"Отлично! 🎯":score>=60?"Хорошо, ещё разок 👍":"Попробуй ещё раз";document.getElementById('score').textContent="Совпадение слов: "+score+"%, "+v;document.getElementById('said').innerHTML="<b>Ты сказал(а):</b> "+(said.trim()||"(тишина)");}showTempo();}
+function showTempo(){const voiced=pitchClean.filter(v=>v).length,userDur=voiced*0.05;if(userDur<0.3||lastSpeakerDur<0.3){document.getElementById('tempo').style.display="none";return;}const sp=lastSpeakerDur,ratio=userDur/sp;let v=ratio>1.25?"медленнее диктора, пободрее":ratio<0.8?"быстрее диктора, не торопись":"темп как у диктора 👍";const t=document.getElementById('tempo');t.style.display="block";t.innerHTML="🕐 <b>Темп:</b> диктор ~"+sp.toFixed(1)+"с · ты ~"+userDur.toFixed(1)+"с, "+v;}
+
+let audioCtx=null,micStream=null,analyser=null,pitchTimer=null,pitchRaw=[],pitchClean=[],pitchSafety=null;
+const canvas=document.getElementById('pitchCanvas'),ctx2=canvas.getContext('2d');
+function clearCanvas(){const r=canvas.getBoundingClientRect();canvas.width=Math.max(300,r.width*2);canvas.height=140;ctx2.clearRect(0,0,canvas.width,canvas.height);pitchClean=[];}
+async function startPitch(){clearCanvas();pitchRaw=[];try{micStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){return;}
+  audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const src=audioCtx.createMediaStreamSource(micStream);analyser=audioCtx.createAnalyser();analyser.fftSize=2048;src.connect(analyser);const buf=new Float32Array(analyser.fftSize);
+  pitchTimer=setInterval(()=>{analyser.getFloatTimeDomainData(buf);const f=autoCorrelate(buf,audioCtx.sampleRate);pitchRaw.push(f>0?f:null);},50);pitchSafety=setTimeout(()=>{if(recognizing)stopRepeat();},60000);}
+function stopPitch(){clearInterval(pitchTimer);pitchTimer=null;clearTimeout(pitchSafety);if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}cleanPitch();drawPitch();}
+function autoCorrelate(buf,sr){let size=buf.length,rms=0;for(let i=0;i<size;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/size);if(rms<0.012)return -1;let r1=0,r2=size-1,th=0.2;for(let i=0;i<size/2;i++)if(Math.abs(buf[i])<th){r1=i;break;}for(let i=1;i<size/2;i++)if(Math.abs(buf[size-i])<th){r2=size-i;break;}buf=buf.slice(r1,r2);size=buf.length;const c=new Array(size).fill(0);for(let i=0;i<size;i++)for(let j=0;j<size-i;j++)c[i]+=buf[j]*buf[j+i];let d=0;while(c[d]>c[d+1])d++;let mv=-1,mp=-1;for(let i=d;i<size;i++)if(c[i]>mv){mv=c[i];mp=i;}if(mp<=0)return -1;const f=sr/mp;return(f>70&&f<400)?f:-1;}
+function cleanPitch(){let a=pitchRaw.slice();const voiced=a.filter(v=>v);if(voiced.length){voiced.sort((x,y)=>x-y);const med=voiced[Math.floor(voiced.length/2)];a=a.map(v=>{if(!v)return null;if(v>med*1.6)return v/2;if(v<med*0.62)return v*2;return v;});}
+  const sm=a.map((v,i)=>{if(!v)return null;const w=[a[i-1],a[i],a[i+1]].filter(x=>x);w.sort((x,y)=>x-y);return w[Math.floor(w.length/2)];});
+  for(let i=0;i<sm.length;i++){if(sm[i]==null){let j=i;while(j<sm.length&&sm[j]==null)j++;const before=sm[i-1],after=sm[j];if(before!=null&&after!=null&&(j-i)<=5){for(let k=i;k<j;k++)sm[k]=before+(after-before)*((k-i+1)/(j-i+1));}i=j-1;}}pitchClean=sm;}
+function drawPitch(){const pts=pitchClean,w=canvas.width,h=canvas.height;ctx2.clearRect(0,0,w,h);const valid=pts.filter(v=>v);if(valid.length<3){ctx2.fillStyle="#c2b0b8";ctx2.font="20px -apple-system,sans-serif";ctx2.fillText("нет звука, скажи громче",20,h/2);return;}
+  const mn=Math.min(...valid),mx=Math.max(...valid),rng=Math.max(15,mx-mn);const xy=[];pts.forEach((v,i)=>{if(v)xy.push({x:(i/(pts.length-1))*(w-24)+12,y:h-18-((v-mn)/rng)*(h-36),i});});
+  ctx2.strokeStyle="#cf7e9b";ctx2.lineWidth=4;ctx2.lineJoin="round";ctx2.lineCap="round";ctx2.beginPath();for(let k=0;k<xy.length;k++){const cont=k>0&&xy[k].i-xy[k-1].i<=1;if(!cont)ctx2.moveTo(xy[k].x,xy[k].y);else{const mx2=(xy[k-1].x+xy[k].x)/2,my2=(xy[k-1].y+xy[k].y)/2;ctx2.quadraticCurveTo(xy[k-1].x,xy[k-1].y,mx2,my2);}}ctx2.stroke();}
+
+loadApp();buildLangMenu();renderHome();
+if(APP.lang){document.getElementById('langCircle').textContent=LANGS[APP.lang].flag;renderLib();show('screenLib');}else show('screenHome');
+if(sb)setTimeout(cloudSave,1200);
+</script>
+</body>
+</html>
